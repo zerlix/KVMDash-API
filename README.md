@@ -26,8 +26,6 @@ KVMDash ist eine moderne Webanwendung, die die effiziente Verwaltung von Virtual
    +-----------------+
 
 ```
-
-
 ## Features
 
 ### VM- und LXC-Verwaltung
@@ -44,15 +42,11 @@ KVMDash ist eine moderne Webanwendung, die die effiziente Verwaltung von Virtual
 
 ## Voraussetzung
 Ein Linux-System mit:
-
 * Installiertem KVM (Kernel-based Virtual Machine).
 * Installiertem libvirt für die Verwaltung von Virtualisierungsressourcen
 
 Eine detaillierte Anleitung zur Installation von KVM unter Debian 12 (Bookworm) finden Sie hier: 
 * [Installation von KVM unter Debian 12 Bookworm](https://themm.curiosum.eu/howto/installation-von-kvm-unter-debian-12-bookworm)
-
-## Zielgruppe 
-KVMDash richtet sich an Systemadministratoren, DevOps-Ingenieure und technische Anwender, die eine zentrale Plattform zur Verwaltung und Überwachung von VMs und Containern auf Linux-Systemen benötigen.
 
 ## Ziel
 Das Hauptziel von KVMDash ist es, die Komplexität bei der Administration von Virtualisierungsumgebungen zu verringern. Dabei werden leistungsstarke Verwaltungs- und Überwachungsfunktionen bereitgestellt, die gleichzeitig leicht zugänglich und intuitiv bedienbar sind.
