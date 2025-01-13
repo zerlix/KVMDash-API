@@ -49,7 +49,7 @@ Ein Linux-System mit:
 * Installiertem libvirt für die Verwaltung von Virtualisierungsressourcen
 
 Eine detaillierte Anleitung zur Installation von KVM unter Debian 12 (Bookworm) finden Sie hier: 
-[Installation von KVM unter Debian 12 Bookworm](https://themm.curiosum.eu/howto/installation-von-kvm-unter-debian-12-bookworm)
+* [Installation von KVM unter Debian 12 Bookworm](https://themm.curiosum.eu/howto/installation-von-kvm-unter-debian-12-bookworm)
 
 ## Zielgruppe 
 KVMDash richtet sich an Systemadministratoren, DevOps-Ingenieure und technische Anwender, die eine zentrale Plattform zur Verwaltung und Überwachung von VMs und Containern auf Linux-Systemen benötigen.
