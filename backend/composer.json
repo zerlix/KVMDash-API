@@ -1,0 +1,17 @@
+{
+    "name": "zerlix/backend",
+    "autoload": {
+        "psr-4": {
+            "Zerlix\\Backend\\": "src/"
+        }
+    },
+    "authors": [
+        {
+            "name": "Zerlix",
+            "email": "t.hemm@t-online.de"
+        }
+    ],
+    "require": {
+        "symfony/process": "^7.2"
+    }
+}
