@@ -18,7 +18,7 @@ error_log("Parsed Route: " . $route);
 error_log("Method: " . $method);
 
 try {
-    $controller = new \Zerlix\Backend\Controller\SystemController();
+    $controller = new \Zerlix\Backend\Controller\Controller();
     echo json_encode($controller->handle($route, $method));
 } catch (Exception $e) {
     http_response_code(500);
