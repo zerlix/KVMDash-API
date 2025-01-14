@@ -1,31 +1,7 @@
 # Projektbeschreibung: KVMDash
 KVMDash ist eine moderne Webanwendung, die die Verwaltung von Virtual Machines (VMs) und Linux-Containern (LXC) auf Linux-Systemen ermöglicht. Mit einer benutzerfreundlichen Oberfläche erleichtert KVMDash die Administration und Überwachung von Virtualisierungsumgebungen.
 
-```
-+-------------------------+         
-|       Frontend:         |         
-|  HTML, CSS, JavaScript, |       
-+-------------------------+        
-            ^
-            |
-            |
-            v
-+-----------------------+
-|        Backend:       |
-|      API-Service      | 
-|     mit PHP und       |
-|  Libvirt-Integration  |
-+-----------------------+                
-           |
-           |
-           v
-   +-----------------+
-   |     libvirt:    |
-   |  Zugriff über   |
-   | libvirt-Socket  |
-   +-----------------+
 
-```
 ## Features
 
 ### VM- und LXC-Verwaltung
