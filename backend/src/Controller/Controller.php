@@ -30,6 +30,7 @@ class Controller
             return $this->systemController->handle($route, $method);
         }
 
+        // Keine Route gefunden. Fehlermeldung zurückgeben
         return [
             'status' => 'error',
             'message' => 'Route not found'
