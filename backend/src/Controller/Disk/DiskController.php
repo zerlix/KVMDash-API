@@ -2,33 +2,15 @@
 
 namespace Zerlix\Backend\Controller\Disk;
 
-use Symfony\Component\Process\Process;
-use Exception;
+use Zerlix\Backend\Controller\CommandController;
 
-class DiskController 
+class DiskController extends CommandController
 {
-    
-    public function handle(string $route, string $method): array  
+    public function handle(string $route, string $method): array 
     {
         if ($route === 'disk' && $method === 'GET') {
-            return $this->getDiskUsage();
+            return $this->executeCommand(['df', '-h']);
         }
         return ['error' => 'Route not found'];
-    }
-
-
-    private function getDiskUsage(): array 
-    {
-        $process = new Process(['df', '-h']);
-        $process->run();
-
-        if (!$process->isSuccessful()) {
-            throw new Exception($process->getErrorOutput());
-        }
-
-        return [
-            'status' => 'success',
-            'data' => trim($process->getOutput())
-        ];
     }
 }
