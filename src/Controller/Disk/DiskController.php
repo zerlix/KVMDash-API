@@ -42,12 +42,7 @@ class DiskController extends CommandController
                 // Add the mount point as the last value
                 $values[] = substr($line, strrpos($line, ' ') + 1);
                 $result[] = array_combine($headers, $values);
-            } else {
-                // Debugging-Informationen direkt ausgeben
-                echo "Header count: " . count($headers) . "\n";
-                echo "Values count: " . count($values) . "\n";
-                echo "Line: " . $line . "\n";
-            }
+            } 
         }
     
         return $result;
