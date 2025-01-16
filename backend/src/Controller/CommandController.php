@@ -13,7 +13,7 @@ abstract class CommandController
 
             // validate command 
             foreach ($command as $cmd) {
-                if (!preg_match('/^[a-zA-Z0-9_\-\/]+$/', $cmd)) {
+                if (!preg_match('/^[a-zA-Z0-9_\-\/\s:.]+$/', $cmd)) {
                     throw new Exception('Invalid command');
                 }
             }
