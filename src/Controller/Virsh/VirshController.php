@@ -19,7 +19,6 @@ class VirshController extends CommandController
             if($response['status'] === 'success') {
                 $response['output'] = $this->parseVirshDomstatsOutput($response['output']);
             }
-          
             return $response;
         }
 
@@ -40,6 +39,7 @@ class VirshController extends CommandController
         ];
     }
 
+    // parse the output of the virsh domstats command
     private function parseVirshDomstatsOutput(string $output): array
     {
         $result = [];
@@ -48,7 +48,7 @@ class VirshController extends CommandController
         // split the output into lines
         $lines = explode("\n", trim($output));
 
-         
+        // iterate over the lines and parse the output         
         foreach ($lines as $line) {
             if (preg_match('/^Domain:\s+\'([^\']+)\'/', $line, $matches)) {
                 $currentDomain = $matches[1];
@@ -58,6 +58,7 @@ class VirshController extends CommandController
             }
         }
 
+        // return the result (json)
         return $result;
     }
 
