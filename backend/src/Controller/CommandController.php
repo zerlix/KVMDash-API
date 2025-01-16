@@ -5,8 +5,6 @@ namespace Zerlix\Backend\Controller;
 use Symfony\Component\Process\Process;
 use Exception;
 
-
-
 abstract class CommandController 
 {
     protected function executeCommand(array $command): array 
