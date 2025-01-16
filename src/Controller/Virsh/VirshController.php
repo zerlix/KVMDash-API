@@ -14,7 +14,12 @@ class VirshController extends CommandController
 
         // api/virsh/list
         if ($route === 'list' && $method === 'GET') {
-            $response =  $this->executeCommand(['virsh', '-c', $this->uri, 'list', '--all']);
+            $response =  $this->executeCommand(['virsh', '-c', $this->uri, 'domstats']);
+            
+            if($response['status'] === 'success') {
+                $response['output'] = $this->parseVirshDomstatsOutput($response['output']);
+            }
+          
             return $response;
         }
 
@@ -34,4 +39,26 @@ class VirshController extends CommandController
             'message' => 'Route not found'
         ];
     }
+
+    private function parseVirshDomstatsOutput(string $output): array
+    {
+        $result = [];
+        $currentDomain = null;
+
+        // split the output into lines
+        $lines = explode("\n", trim($output));
+
+         
+        foreach ($lines as $line) {
+            if (preg_match('/^Domain:\s+\'([^\']+)\'/', $line, $matches)) {
+                $currentDomain = $matches[1];
+                $result[$currentDomain] = [];
+            } elseif ($currentDomain && preg_match('/^\s*(\S+)\s*=\s*(\S+)/', $line, $matches)) {
+                $result[$currentDomain][$matches[1]] = $matches[2];
+            }
+        }
+
+        return $result;
+    }
+
 }
