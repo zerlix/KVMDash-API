@@ -8,14 +8,14 @@ class VirshController extends CommandController
 {
     private $uri = 'qemu:///system';
 
-    public function handle(string $route, string $method): array 
+    public function handle(string $route, string $method): array
     {
         $route = str_replace('virsh/', '', $route);
-        
+
         // api/virsh/list
         if ($route === 'list' && $method === 'GET') {
             $response =  $this->executeCommand(['virsh', '-c', $this->uri, 'list', '--all']);
-            return $response; 
+            return $response;
         }
 
         // api/virsh/start/{name}
@@ -28,6 +28,10 @@ class VirshController extends CommandController
             return $this->executeCommand(['virsh', '-c', $this->uri, 'shutdown', $matches[1]]);
         }
 
-        return ['error' => 'Route not found'];
+        // return an error if the route is not found
+        return [
+            'status' => 'error',
+            'message' => 'Route not found'
+        ];
     }
 }
