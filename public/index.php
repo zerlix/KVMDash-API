@@ -28,15 +28,16 @@ if (!$ipAllowed) {
     exit;
 }
 
-
+/*--------------- DISABLED FOR TESTING
 // Sicherheitsüberprüfung basierend auf API-Token
 $token = $_SERVER['HTTP_X_API_TOKEN'] ?? '';
 if ($token !== getenv('API_TOKEN')) {
     http_response_code(403);
     echo json_encode(['error' => 'Forbidden']);
-    // -------------------------------------- DISABLED FOR TESTING
+    
     /// exit;
 }
+------------------------------- */
 
 
 
