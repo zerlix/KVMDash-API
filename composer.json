@@ -10,8 +10,5 @@
             "name": "Zerlix",
             "email": "t.hemm@t-online.de"
         }
-    ],
-    "require": {
-        "symfony/process": "^7.2"
-    }
+    ]
 }

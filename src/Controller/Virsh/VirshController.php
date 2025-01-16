@@ -14,7 +14,8 @@ class VirshController extends CommandController
         
         // api/virsh/list
         if ($route === 'list' && $method === 'GET') {
-            return $this->executeCommand(['virsh', '-c', $this->uri, 'list', '--all']);
+            $response =  $this->executeCommand(['virsh', '-c', $this->uri, 'list', '--all']);
+            return $response; 
         }
 
         // api/virsh/start/{name}

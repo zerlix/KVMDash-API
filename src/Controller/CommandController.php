@@ -1,8 +1,6 @@
 <?php
 
 namespace Zerlix\KvmDash\Api\Controller;
-
-use Symfony\Component\Process\Process;
 use Exception;
 
 abstract class CommandController 
@@ -18,23 +16,32 @@ abstract class CommandController
                 }
             }
 
-            // execute the command
-            $process = new Process($command);
-            $process->run();
-
-            // check if the command was successful
-            if (!$process->isSuccessful()) {
-                return [
-                    'status' => 'error',
-                    'message' => $process->getErrorOutput()
-                ];
-            }
-            // return the output
-            return [
-                'status' => 'success',
-                'data' => trim($process->getOutput())
+            $descriptorspec = [
+                0 => ["pipe", "r"],  // stdin
+                1 => ["pipe", "w"],  // stdout
+                2 => ["pipe", "w"]   // stderr
             ];
+
+            $process = proc_open(implode(' ', $command), $descriptorspec, $pipes);    
             
+            if (!is_resource($process)) {
+                throw new Exception("Unable to execute command: $command");
+            }
+
+            $output = stream_get_contents($pipes[1]);
+            $errorOutput = stream_get_contents($pipes[2]);
+            
+            fclose($pipes[1]);
+            fclose($pipes[2]);
+
+            $returnVar = proc_close($process);
+            
+            if ($returnVar !== 0) {
+                throw new Exception($errorOutput);
+            }
+
+            return ['status' => 'success', 'output' => $output];
+
           // catch any exceptions  
         } catch (Exception $e) {
             return [
