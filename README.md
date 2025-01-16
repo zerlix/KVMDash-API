@@ -12,8 +12,6 @@ KVMDash ist eine moderne Webanwendung, die die Verwaltung von Virtual Machines (
 * Echtzeitüberwachung von Ressourcen wie CPU, Arbeitsspeicher, Festplattenauslastung und weiteren wichtigen Systemmetriken.
 * Übersichtliche Darstellung der Systemleistung für eine optimale Kontrolle und Fehleranalyse.
 
-### Benutzer-Authentifizierung
-* Sichere Login-Mechanismen zum Schutz vor unberechtigtem Zugriff.
 
 ## Voraussetzung
 Ein Linux-System mit:
