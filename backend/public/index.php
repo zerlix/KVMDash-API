@@ -1,22 +1,14 @@
 <?php
 require_once __DIR__ . '/../vendor/autoload.php';
 
-ini_set('display_errors', 1);
-error_reporting(E_ALL);
-
+// json header
 header('Content-Type: application/json');
-
-// Debug
-error_log("Request URI: " . $_SERVER['REQUEST_URI']);
 
 // Route bereinigen
 $route = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
 $method = $_SERVER['REQUEST_METHOD'];
 
-// Debug
-error_log("Parsed Route: " . $route);
-error_log("Method: " . $method);
-
+// Controller instanzieren
 try {
     $controller = new \Zerlix\Backend\Controller\Controller();
     echo json_encode($controller->handle($route, $method));

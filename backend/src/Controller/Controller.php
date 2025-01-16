@@ -24,6 +24,15 @@ class Controller
         // remove the /api/ prefix from the route
         $route = str_replace('/api/', '', $route);
 
+        
+        // validate method
+        if (!in_array($method, ['GET', 'POST', 'PUT', 'DELETE'])) {
+            return [
+                'status' => 'error',
+                'message' => 'Invalid HTTP method'
+            ];
+        }
+
         // handle the disk routes
         if (str_starts_with($route, 'disk')) {
             return $this->diskController->handle($route, $method);

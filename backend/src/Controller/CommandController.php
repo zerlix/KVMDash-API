@@ -10,6 +10,14 @@ abstract class CommandController
     protected function executeCommand(array $command): array 
     {
         try {
+
+            // validate command 
+            foreach ($command as $cmd) {
+                if (!preg_match('/^[a-zA-Z0-9_\-\/\s:.]+$/', $cmd)) {
+                    throw new Exception('Invalid command');
+                }
+            }
+
             // execute the command
             $process = new Process($command);
             $process->run();
