@@ -1,8 +1,8 @@
 <?php
 
-namespace Zerlix\Backend\Controller\Virsh;
+namespace Zerlix\KvmDash\Api\Controller\Virsh;
 
-use Zerlix\Backend\Controller\CommandController;
+use Zerlix\KvmDash\Api\Controller\CommandController;
 
 class VirshController extends CommandController
 {

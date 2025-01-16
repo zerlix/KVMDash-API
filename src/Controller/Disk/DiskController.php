@@ -1,8 +1,8 @@
 <?php
 
-namespace Zerlix\Backend\Controller\Disk;
+namespace Zerlix\KvmDash\Api\Controller\Disk;
 
-use Zerlix\Backend\Controller\CommandController;
+use Zerlix\KvmDash\Api\Controller\CommandController;
 
 class DiskController extends CommandController
 {

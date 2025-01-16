@@ -1,8 +1,8 @@
 <?php
 
-namespace Zerlix\Backend\Controller\System;
+namespace Zerlix\KvmDash\Api\Controller\System;
 
-use Zerlix\Backend\Controller\CommandController;
+use Zerlix\KvmDash\Api\Controller\CommandController;
 
 class SystemController extends CommandController
 {

@@ -1,6 +1,6 @@
 <?php
 
-namespace Zerlix\Backend\Controller;
+namespace Zerlix\KvmDash\Api\Controller;
 
 use Symfony\Component\Process\Process;
 use Exception;

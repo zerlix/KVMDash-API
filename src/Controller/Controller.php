@@ -1,10 +1,10 @@
 <?php
 
-namespace Zerlix\Backend\Controller;
+namespace Zerlix\KvmDash\Api\Controller;
 
-use Zerlix\Backend\Controller\Disk\DiskController;
-use Zerlix\Backend\Controller\System\SystemController;
-use Zerlix\Backend\Controller\Virsh\VirshController;
+use Zerlix\KvmDash\Api\Controller\Disk\DiskController;
+use Zerlix\KvmDash\Api\Controller\System\SystemController;
+use Zerlix\KvmDash\Api\Controller\Virsh\VirshController;
 
 class Controller
 {
