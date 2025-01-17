@@ -15,23 +15,62 @@ class VirshController extends CommandController
         // api/virsh/list
         if ($route === 'list' && $method === 'GET') {
             $response =  $this->executeCommand(['virsh', '-c', $this->uri, 'domstats']);
-            
-            if($response['status'] === 'success') {
+
+            if ($response['status'] === 'success') {
                 $response['output'] = $this->parseVirshDomstatsOutput($response['output']);
             }
             return $response;
         }
 
-        // api/virsh/start/{name}
+        // api/virsh/start/{name_or_uuid}
         if (preg_match('/^start\/(.+)$/', $route, $matches)) {
-            return $this->executeCommand(['virsh', '-c', $this->uri, 'start', $matches[1]]);
+            $domainIdentifier = $matches[1];
+            $domains = $this->executeCommand(['virsh', '-c', $this->uri, 'list', '--all', '--name', '--uuid']);
+            var_dump($domains);
+            if ($domains['status'] === 'success') {
+                $lines = explode("\n", $domains['output']);
+                foreach ($lines as $line) {
+                    $parts = preg_split('/\s+/', trim($line));
+                    if (count($parts) == 2) {
+                        $uuid = $parts[0];
+                        $name = $parts[1];
+                        if (strcasecmp($name, $domainIdentifier) == 0 || $uuid === $domainIdentifier) {
+                            return $this->executeCommand(['virsh', '-c', $this->uri, 'start', $name]);
+                        }
+                    }
+                }
+                return ['status' => 'error', 'message' => "Domain '$domainIdentifier' not found"];
+            } else {
+                return ['status' => 'error', 'message' => 'Unable to list domains'];
+            }
         }
 
-        // api/virsh/shutdown/{name}
+
+        // api/virsh/shutdown/{name_or_uuid}
         if (preg_match('/^shutdown\/(.+)$/', $route, $matches)) {
-            return $this->executeCommand(['virsh', '-c', $this->uri, 'shutdown', $matches[1]]);
+            $domainIdentifier = $matches[1];
+            $domains = $this->executeCommand(['virsh', '-c', $this->uri, 'list', '--all', '--name', '--uuid']);
+
+            if ($domains['status'] === 'success') {
+                $lines = explode("\n", $domains['output']);
+                foreach ($lines as $line) {
+                    $parts = preg_split('/\s+/', trim($line));
+                    if (count($parts) == 2) {
+                        $uuid = $parts[0];
+                        $name = $parts[1];
+                        if (strcasecmp($name, $domainIdentifier) == 0 || $uuid === $domainIdentifier) {
+                            return $this->executeCommand(['virsh', '-c', $this->uri, 'shutdown', $name]);
+                        }
+                    }
+                }
+                return ['status' => 'error', 'message' => "Domain '$domainIdentifier' not found"];
+            } else {
+                return ['status' => 'error', 'message' => 'Unable to list domains'];
+            }
         }
 
+
+        
         // return an error if the route is not found
         return [
             'status' => 'error',
@@ -61,5 +100,4 @@ class VirshController extends CommandController
         // return the result (json)
         return $result;
     }
-
 }
