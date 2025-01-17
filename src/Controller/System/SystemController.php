@@ -16,7 +16,7 @@ class SystemController extends CommandController
             $output = $this->executeCommand(['uptime']);
             $outputString = implode("\n", array_map('trim', $output));
 
-            // Beispiel für die Analyse der Ausgabe
+            // format the output
             if (preg_match('/up\s+(.*?),\s+\d+\s+user.*load\s+average:\s+([\d.]+),\s+([\d.]+),\s+([\d.]+)/', $outputString, $matches)) {
                 $formattedOutput = [
                     'uptime' => $matches[1],
@@ -37,7 +37,7 @@ class SystemController extends CommandController
             $output = $this->executeCommand(['free', '-h', '-t', '-w']);
             $outputString = implode("\n", array_map('trim', $output));
 
-            // Beispiel für die Analyse der Ausgabe
+            // format the output
             if (preg_match('/Mem:\s+(\S+)\s+(\S+)\s+(\S+)\s+(\S+)\s+(\S+)\s+(\S+)/', $outputString, $matches)) {
                 $formattedOutput = [
                     'total' => $matches[1],
@@ -59,7 +59,7 @@ class SystemController extends CommandController
             $output = $this->executeCommand(['lscpu']);
             $outputString = implode("\n", array_map('trim', $output));
 
-            // Beispiel für die Analyse der Ausgabe
+            // format the output
             if (preg_match('/Model name:\s+(.*)/', $outputString, $matches)) {
                 $formattedOutput = [
                     'model' => $matches[1]
@@ -75,7 +75,7 @@ class SystemController extends CommandController
             $output = $this->executeCommand(['lscpu']);
             $outputString = implode("\n", array_map('trim', $output));
 
-            // Beispiel für die Analyse der Ausgabe
+            // format the output
             $formattedOutput = [];
             if (preg_match_all('/(.+):\s+(.*)/', $outputString, $matches)) {
                 foreach ($matches[1] as $index => $key) {
