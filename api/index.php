@@ -1,7 +1,7 @@
 <?php
 require_once __DIR__ . '/../vendor/autoload.php';
-require_once __DIR__ . '/../src/lib/loadEnv.php';
-require_once __DIR__ . '/../src/lib/ipInRange.php';
+require_once __DIR__ . '/../backend/lib/loadEnv.php';
+require_once __DIR__ . '/../backend/lib/ipInRange.php';
 
 use Zerlix\KvmDash\Api\Controller\Controller;
 
