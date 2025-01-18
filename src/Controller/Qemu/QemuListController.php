@@ -13,20 +13,14 @@ class QemuListController extends CommandController
         // execute the virsh domstats command and return the formated output
         $response =  $this->executeCommand(['virsh', '-c', $this->uri, 'domstats']);
         if ($response['status'] === 'success') {
-            $response['output'] = $this->parseVirshDomstatsOutput($response['output']);
+            $formattedOutput = $this->formatOutput($response['output']);
         }
-        return $response;
+        return ['status' => 'success', 'data' => $formattedOutput];
 
-
-        // return an error if the route is not found
-        return [
-            'status' => 'error',
-            'message' => 'Route not found'
-        ];
     }
 
     // parse the output of the virsh domstats command
-    private function parseVirshDomstatsOutput(string $output): array
+    private function formatOutput(string $output): array
     {
         $result = [];
         $currentDomain = null;

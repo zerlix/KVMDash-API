@@ -44,25 +44,10 @@ class Controller
             return $this->qemuController->handle($route, $method);
         }
 
-
-
-        /*
-        /// OLD ROUTES
-        // handle the disk routes
-        if (str_starts_with($route, 'disk')) {
-            return $this->diskController->handle($route, $method);
-        }
-
-        // handle the system routes
-        if (str_starts_with($route, 'system')) {
-            return $this->systemController->handle($route, $method);
-        }*/
-
-        
         // return an error if the route is not found
         return [
             'status' => 'error',
-            'message' => 'Route not found'
+            'message' => 'Controller: Route not found'
         ];
     }
 }

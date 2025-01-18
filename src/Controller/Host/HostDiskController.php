@@ -13,7 +13,8 @@ class HostDiskController extends CommandController
             $response = $this->executeCommand(['df', '-h', '-x', 'devtmpfs', '-x', 'tmpfs']);
             //var_dump($response);
             if ($response['status'] === 'success') {
-                $response['output'] = $this->parseDfOutput($response['output']);
+                $formattedOutput = $this->formatOutput($response['output']);
+                return ['status' => 'success', 'data' => $formattedOutput];
             }
             return $response;
         }
@@ -25,8 +26,7 @@ class HostDiskController extends CommandController
         ];
     }
 
-
-    private function parseDfOutput(string $output): array
+    private function formatOutput(string $output): array
     {
         $lines = explode("\n", trim($output));
         $headers = preg_split('/\s+/', array_shift($lines));

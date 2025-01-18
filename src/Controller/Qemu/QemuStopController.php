@@ -12,6 +12,10 @@ class QemuStopController extends CommandController
     {
         // execute the virsh shutdown command and return the output
         $response = $this->executeCommand(['virsh', '-c', $this->uri, 'shutdown', $domain]);
-        return $response;
+        if ($response['status'] === 'success') {
+            // $formattedOutput = $this->formatOutput($response['output']);
+            $formattedOutput = $response['output'];
+        }
+        return ['status' => 'success', 'data' => $formattedOutput];
     }
 }

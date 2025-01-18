@@ -10,7 +10,7 @@ class LxcController extends CommandController
     {
         return [
             'status' => 'error',
-            'message' => 'Route not found'
+            'message' => 'LxcController: Route not found'
         ];
     }
 }
