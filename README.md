@@ -1,4 +1,4 @@
-# Projektbeschreibung: KVMDash Backend
+# Projektbeschreibung: KVMDash-API
 Das KVMDash-API ist eine API, die die Verwaltung von Virtual Machines (VMs) und Linux-Containern (LXC) auf Linux-Systemen ermöglicht. Es bietet Endpunkte zur Steuerung und Überwachung von Virtualisierungsumgebungen und dient als Rückgrat der KVMDash Webanwendung. 
 https://github.com/zerlix/KVMDash
 
