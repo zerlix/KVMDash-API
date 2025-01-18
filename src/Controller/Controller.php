@@ -2,21 +2,18 @@
 
 namespace Zerlix\KvmDash\Api\Controller;
 
-use Zerlix\KvmDash\Api\Controller\Disk\DiskController;
-use Zerlix\KvmDash\Api\Controller\System\SystemController;
-use Zerlix\KvmDash\Api\Controller\Virsh\VirshController;
+use Zerlix\KvmDash\Api\Controller\Host\HostController;
+use Zerlix\KvmDash\Api\Controller\Qemu\QemuController;
 
 class Controller
 {
-    private $diskController;
-    private $systemController;
-    private $virshController;
+    private $hostController;
+    private $qemuController;
 
     public function __construct()
     {
-        $this->diskController = new DiskController();
-        $this->systemController = new SystemController();
-        $this->virshController = new VirshController();
+        $this->qemuController = new QemuController();
+        $this->hostController = new HostController();
     }
 
     public function handle(string $route, string $method): array
@@ -24,7 +21,7 @@ class Controller
         // remove the /api/ prefix from the route
         $route = str_replace('/api/', '', $route);
 
-        
+
         // validate method
         if (!in_array($method, ['GET', 'POST', 'PUT', 'DELETE'])) {
             return [
@@ -33,6 +30,24 @@ class Controller
             ];
         }
 
+        /* 
+            handle the host routes
+        */
+        if (str_starts_with($route, 'host')) {
+            return $this->hostController->handle($route, $method);
+        }
+
+        /* 
+            handle the qemu routes
+        */
+        if (str_starts_with($route, 'qemu')) {
+            return $this->qemuController->handle($route, $method);
+        }
+
+
+
+        /*
+        /// OLD ROUTES
         // handle the disk routes
         if (str_starts_with($route, 'disk')) {
             return $this->diskController->handle($route, $method);
@@ -41,13 +56,9 @@ class Controller
         // handle the system routes
         if (str_starts_with($route, 'system')) {
             return $this->systemController->handle($route, $method);
-        }
+        }*/
 
-        // handle the virsh routes
-        if (str_starts_with($route, 'virsh')) {
-            return $this->virshController->handle($route, $method);
-        }
-
+        
         // return an error if the route is not found
         return [
             'status' => 'error',
