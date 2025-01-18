@@ -4,16 +4,19 @@ namespace Zerlix\KvmDash\Api\Controller;
 
 use Zerlix\KvmDash\Api\Controller\Host\HostController;
 use Zerlix\KvmDash\Api\Controller\Qemu\QemuController;
+use Zerlix\KvmDash\Api\Controller\Lxc\LxcController;
 
 class Controller
 {
     private $hostController;
     private $qemuController;
+    private $lxcController;
 
     public function __construct()
     {
         $this->qemuController = new QemuController();
         $this->hostController = new HostController();
+        $this->lxcController = new LxcController();
     }
 
     public function handle(string $route, string $method): array
@@ -44,6 +47,10 @@ class Controller
             return $this->qemuController->handle($route, $method);
         }
 
+        if (str_starts_with($route, 'lxc')) {
+            return $this->lxcController->handle($route, $method);
+        }
+        
         // return an error if the route is not found
         return [
             'status' => 'error',
