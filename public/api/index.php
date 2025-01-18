@@ -1,25 +1,21 @@
 <?php
-require_once __DIR__ . '/../vendor/autoload.php';
-require_once __DIR__ . '/../backend/lib/loadEnv.php';
-require_once __DIR__ . '/../backend/lib/ipInRange.php';
+require_once __DIR__ . '/../../vendor/autoload.php';
+require_once __DIR__ . '/../../src/lib/loadEnv.php';
+require_once __DIR__ . '/../../src/lib/ipInRange.php';
 use Zerlix\KvmDash\Api\Controller\Controller;
 
-// Error reporting
+// Load .env file
+loadEnv(__DIR__ . '/../../.env');
+
+// Debug mode
 if (getenv('DEBUG') === 'true') {
-    // Enable error reporting and display errors
     ini_set('display_errors', 1);
     ini_set('display_startup_errors', 1);
     error_reporting(E_ALL);
 } 
 
-// json header
-header('Content-Type: application/json');
 
-// Load .env file
-loadEnv(__DIR__ . '/../.env');
-
-
-// Sicherheitsüberprüfung basierend auf IP
+// ip check
 $allowedIps = explode(',', getenv('ALLOWED_IPS'));
 $clientIp = $_SERVER['REMOTE_ADDR'] ?? '';
 $ipAllowed = false;
@@ -29,6 +25,7 @@ foreach ($allowedIps as $allowedIp) {
         break;
     }
 }
+
 if (!$ipAllowed) {
     http_response_code(403);
     echo json_encode(['error' => 'Forbidden']);
@@ -36,7 +33,7 @@ if (!$ipAllowed) {
 }
 
 
-// json header
+// JSON header
 header('Content-Type: application/json');
 
 

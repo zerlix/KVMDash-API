@@ -78,7 +78,7 @@ class VirshController extends CommandController
             }
         }
 
-        // return the result (json)
+        // return the result
         return $result;
     }
 }

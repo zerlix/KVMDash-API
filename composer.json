@@ -2,7 +2,7 @@
     "name": "zerlix/kvmdash",
     "autoload": {
         "psr-4": {
-            "Zerlix\\KvmDash\\Api\\": "backend/"
+            "Zerlix\\KvmDash\\Api\\": "src/"
         }
     },
     "authors": [
