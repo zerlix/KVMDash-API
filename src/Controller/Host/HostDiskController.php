@@ -1,10 +1,10 @@
 <?php
 
-namespace Zerlix\KvmDash\Api\Controller\Disk;
+namespace Zerlix\KvmDash\Api\Controller\Host;
 
 use Zerlix\KvmDash\Api\Controller\CommandController;
 
-class DiskController extends CommandController
+class HostDiskController extends CommandController
 {
     public function handle(string $route, string $method): array
     {
