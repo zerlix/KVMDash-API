@@ -12,6 +12,10 @@ class QemuStartController extends CommandController
     {
         // execute the virsh start command and return the output
         $response = $this->executeCommand(['virsh', '-c', $this->uri, 'start', $domain]);
-        return $response;
+        if ($response['status'] === 'success') {
+            // $formattedOutput = $this->formatOutput($response['output']);
+            $formattedOutput = $response['output'];
+        }
+        return ['status' => 'success', 'data' => $formattedOutput];
     }
 }

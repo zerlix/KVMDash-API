@@ -1,29 +1,25 @@
-# Projektbeschreibung: KVMDash
-KVMDash ist eine moderne Webanwendung, die die Verwaltung von Virtual Machines (VMs) und Linux-Containern (LXC) auf Linux-Systemen ermöglicht. Mit einer benutzerfreundlichen Oberfläche erleichtert KVMDash die Administration und Überwachung von Virtualisierungsumgebungen.
-
+# Projektbeschreibung: KVMDash Backend
+Das KVMDash-API ist eine API, die die Verwaltung von Virtual Machines (VMs) und Linux-Containern (LXC) auf Linux-Systemen ermöglicht. Es bietet Endpunkte zur Steuerung und Überwachung von Virtualisierungsumgebungen und dient als Rückgrat der KVMDash Webanwendung. 
+https://github.com/zerlix/KVMDash
 
 ## Features
 
-### VM- und LXC-Verwaltung
-* Erstellen, Löschen und Konfigurieren von VMs und Containern über die Weboberfläche.
-* Nutzung von Vorlagen für die schnelle und standardisierte Erstellung von VMs und Containern.
+### API zur VM- und LXC-Verwaltung
+* Endpunkte zum Erstellen, Löschen und Konfigurieren von VMs und Containern.
+* Unterstützung von Vorlagen für die schnelle und standardisierte Erstellung von VMs und Containern.
 
 ### Systemmonitoring
-* Echtzeitüberwachung von Ressourcen wie CPU, Arbeitsspeicher, Festplattenauslastung und weiteren wichtigen Systemmetriken.
-* Übersichtliche Darstellung der Systemleistung für eine optimale Kontrolle und Fehleranalyse.
-
+* Endpunkte zur Echtzeitüberwachung von Ressourcen wie CPU, Arbeitsspeicher, Festplattenauslastung und weiteren wichtigen Systemmetriken.
+* Bereitstellung von Daten zur Systemleistung für eine optimale Kontrolle und Fehleranalyse.
 
 ## Voraussetzung
 Ein Linux-System mit:
 * Installiertem KVM (Kernel-based Virtual Machine).
-* Installiertem libvirt für die Verwaltung von Virtualisierungsressourcen
-
-
+* Installiertem libvirt für die Verwaltung von Virtualisierungsressourcen.
 
 Eine detaillierte Anleitung zur Installation von KVM und libvirt unter Debian 12 (Bookworm) finden Sie hier: 
 * [Installation von KVM unter Debian 12 Bookworm](https://themm.curiosum.eu/howto/installation-von-kvm-unter-debian-12-bookworm)
 * [libvirt-howto](https://themm.curiosum.eu/howto/libvirt-howto)
-
 
 Nach erfolgreicher Installation muss User "www-data" der Gruppe libvirt und kvm hinzugefügt werden.
 ```bash
@@ -31,7 +27,7 @@ usermod -aG libvirt,kvm www-data
 ```
 
 ## Ziel
-Das Hauptziel von KVMDash ist es, die Komplexität bei der Administration von Virtualisierungsumgebungen zu verringern. Dabei werden Verwaltungs- und Überwachungsfunktionen bereitgestellt, die gleichzeitig leicht zugänglich und intuitiv bedienbar sind.
+Das Hauptziel des KVMDash Backends ist es, eine robuste und flexible API bereitzustellen, die die Komplexität bei der Administration von Virtualisierungsumgebungen verringert. Dabei werden Verwaltungs- und Überwachungsfunktionen bereitgestellt, die gleichzeitig leicht zugänglich und intuitiv bedienbar sind.
 
 
 

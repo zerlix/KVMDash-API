@@ -45,7 +45,7 @@ class QemuController extends CommandController
 
         return [
             'status' => 'error',
-            'message' => 'Route not found QemuController'
+            'message' => 'QemuController: Route not found'
         ];
     }
 }

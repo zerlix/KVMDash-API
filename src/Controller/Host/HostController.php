@@ -42,8 +42,8 @@ class HostController extends CommandController
 
         return [
             'status' => 'error',
-            'message' => 'Route not found'
+            'message' => 'HostController: Route not found'
         ];
     }
-    
+
 }
