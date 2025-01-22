@@ -2,22 +2,21 @@
 
 namespace Zerlix\KvmDash\Api\Controller\Qemu;
 
-use Zerlix\KvmDash\Api\Controller\CommandController;
-use Zerlix\KvmDash\Api\Controller\Qemu\QemuListController;
-use Zerlix\KvmDash\Api\Controller\Qemu\QemuStartController;
-use Zerlix\KvmDash\Api\Controller\Qemu\QemuStopController;
+use Zerlix\KvmDash\Api\Model\Qemu\QemuListModel;
+use Zerlix\KvmDash\Api\Model\Qemu\QemuStartModel;
+use Zerlix\KvmDash\Api\Model\Qemu\QemuStopModel;
 
-class QemuController extends CommandController
+class QemuController
 {
-    private $listController;
-    private $startController;
-    private $stopController;
+    private $listModel;
+    private $startModel;
+    private $stopModel;
 
     public function __construct()
     {
-        $this->listController = new QemuListController();
-        $this->startController = new QemuStartController();
-        $this->stopController = new QemuStopController();
+        $this->listModel = new QemuListModel();
+        $this->startModel = new QemuStartModel();
+        $this->stopModel = new QemuStopModel();
     }
 
     public function handle(string $route, string $method): array
@@ -27,20 +26,20 @@ class QemuController extends CommandController
 
         // api/qemu/list
         if ($route === 'list' && $method === 'GET') {
-            return $this->listController->handle($route, $method);
+            return $this->listModel->handle($route, $method);
         }
 
         var_dump($method);
         // api/qemu/start/{domain}
         if (strpos($route, 'start') === 0 && $method === 'POST') {
             $domain = substr($route, strlen('start/'));
-            return $this->startController->handle($route, $method, $domain);
+            return $this->startModel->handle($route, $method, $domain);
         }
 
         // api/qemu/stop/{domain}
         if (strpos($route, 'stop/') === 0 && $method === 'POST') {
             $domain = substr($route, strlen('stop/'));
-            return $this->stopController->handle($route, $method, $domain);
+            return $this->stopModel->handle($route, $method, $domain);
         }
 
         return [
