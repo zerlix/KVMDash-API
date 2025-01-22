@@ -1,17 +1,17 @@
 <?php
 
-namespace Zerlix\KvmDash\Api\Controller\Qemu;
+namespace Zerlix\KvmDash\Api\Model\Qemu;
 
-use Zerlix\KvmDash\Api\Controller\CommandController;
+use Zerlix\KvmDash\Api\Model\CommandModel;
 
-class QemuStartController extends CommandController
+class QemuStopModel extends CommandModel
 {
     private $uri = 'qemu:///system';
 
     public function handle(string $route, string $method, string $domain): array
     {
-        // execute the virsh start command and return the output
-        $response = $this->executeCommand(['virsh', '-c', $this->uri, 'start', $domain]);
+        // execute the virsh shutdown command and return the output
+        $response = $this->executeCommand(['virsh', '-c', $this->uri, 'shutdown', $domain]);
         if ($response['status'] === 'success') {
             // $formattedOutput = $this->formatOutput($response['output']);
             $formattedOutput = $response['output'];

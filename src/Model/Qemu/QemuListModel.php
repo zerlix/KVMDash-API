@@ -1,10 +1,10 @@
 <?php
 
-namespace Zerlix\KvmDash\Api\Controller\Qemu;
+namespace Zerlix\KvmDash\Api\Model\Qemu;
 
-use Zerlix\KvmDash\Api\Controller\CommandController;
+use Zerlix\KvmDash\Api\Model\CommandModel;
 
-class QemuListController extends CommandController
+class QemuListModel extends CommandModel
 {
     private $uri = 'qemu:///system';
 

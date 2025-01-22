@@ -1,9 +1,9 @@
 <?php
 
-namespace Zerlix\KvmDash\Api\Controller;
+namespace Zerlix\KvmDash\Api\Model;
 use Exception;
 
-abstract class CommandController 
+abstract class CommandModel 
 {
     protected function executeCommand(array $command): array 
     {

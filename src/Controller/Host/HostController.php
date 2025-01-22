@@ -2,22 +2,22 @@
 
 namespace Zerlix\KvmDash\Api\Controller\Host;
 
-use Zerlix\KvmDash\Api\Controller\Host\HostCpuController;
-use Zerlix\KvmDash\Api\Controller\Host\HostMemController;
-use Zerlix\KvmDash\Api\Controller\Host\HostDiskController;
-use Zerlix\KvmDash\Api\Controller\CommandController;
+use Zerlix\KvmDash\Api\Model\Host\HostCpuModel;
+use Zerlix\KvmDash\Api\Model\Host\HostMemModel;
+use Zerlix\KvmDash\Api\Model\Host\HostDiskModel;
 
-class HostController extends CommandController
+class HostController
 {
-    private $cpuController;
-    private $memController;
-    private $diskController;
+    private $cpuModel;
+    private $memModel;
+    private $diskModel;
 
     public function __construct()
     {
-        $this->cpuController = new HostCpuController();
-        $this->memController = new HostMemController();
-        $this->diskController = new HostDiskController();
+        $this->cpuModel = new HostCpuModel();
+        $this->memModel = new HostMemModel();
+        $this->diskModel= new HostDiskModel();
+        
     }
 
     public function handle(string $route, string $method): array
@@ -27,17 +27,17 @@ class HostController extends CommandController
 
         // api/host/cpu
         if ($route === 'cpu' && $method === 'GET') {
-            return $this->cpuController->handle($route, $method);
+            return $this->cpuModel->handle($route, $method);
         }
 
         // api/host/mem
         if ($route === 'mem' && $method === 'GET') {
-            return $this->memController->handle($route, $method);
+            return $this->memModel->handle($route, $method);
         }
 
         // api/host/disk
         if ($route === 'disk' && $method === 'GET') {
-            return $this->diskController->handle($route, $method);
+            return $this->diskModel->handle($route, $method);
         }
 
         return [
