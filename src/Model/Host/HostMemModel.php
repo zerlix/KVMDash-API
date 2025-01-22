@@ -1,10 +1,9 @@
 <?php
 
-namespace Zerlix\KvmDash\Api\Controller\Host;
+namespace Zerlix\KvmDash\Api\Model\Host;
+use Zerlix\KvmDash\Api\Model\CommandModel;
 
-use Zerlix\KvmDash\Api\Controller\CommandController;
-
-class HostMemController extends CommandController
+class HostMemModel extends CommandModel
 {
     public function handle(string $route, string $method): array
     {
