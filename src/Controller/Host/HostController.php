@@ -4,6 +4,7 @@ namespace Zerlix\KvmDash\Api\Controller\Host;
 
 use Zerlix\KvmDash\Api\Model\Host\HostCpuModel;
 use Zerlix\KvmDash\Api\Model\Host\HostMemModel;
+use Zerlix\KvmDash\Api\Model\Host\HostDiskModel;
 
 class HostController
 {
@@ -15,7 +16,7 @@ class HostController
     {
         $this->cpuModel = new HostCpuModel();
         $this->memModel = new HostMemModel();
-        $this->diskModel= new HostMemModel();
+        $this->diskModel= new HostDiskModel();
         
     }
 
