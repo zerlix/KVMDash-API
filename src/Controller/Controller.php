@@ -30,6 +30,8 @@ class Controller
             ];
         }
 
+
+        
         /* 
             handle the host routes
         */
@@ -37,13 +39,12 @@ class Controller
             return $this->hostController->handle($route, $method);
         }
 
-        /* 
-            handle the qemu routes
-        */
         if (str_starts_with($route, 'qemu')) {
             return $this->qemuController->handle($route, $method);
         }
+
         
+
         // return an error if the route is not found
         return [
             'status' => 'error',

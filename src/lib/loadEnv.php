@@ -3,26 +3,33 @@
  * Loads environment variables from a .env file into the PHP environment.
  *
  * @param string $filePath The path to the .env file.
- * @throws Exception If the .env file does not exist.
+ * @throws Exception If the .env file does not exist or cannot be read.
  */
-function loadEnv($filePath) {
-    if (!file_exists($filePath)) {
-        throw new Exception('.env file not found');
+function loadEnv(string $filePath) {
+    if (!file_exists($filePath) || !is_readable($filePath)) {
+        throw new Exception('.env file not found or not readable');
     }
 
-    $env = file_get_contents($filePath);
-    $lines = explode("\n", $env);
+    $lines = file($filePath, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
 
     foreach ($lines as $line) {
-        // Ignore empty lines and comments
-        if (trim($line) === '' || strpos(trim($line), '#') === 0) {
+        // Ignore comments
+        if (strpos(trim($line), '#') === 0) {
             continue;
         }
 
         // Extract key and value
-        preg_match("/([^#]+)\=(.*)/", $line, $matches);
-        if (isset($matches[2])) {
-            putenv(trim($line));
+        $parts = explode('=', $line, 2);
+        if (count($parts) === 2) {
+            $key = trim($parts[0]);
+            $value = trim($parts[1]);
+
+            // Optional: Remove quotes around the value
+            $value = trim($value, '"\'');
+
+            // Set variable in environment
+            putenv("$key=$value");
+            $_ENV[$key] = $value;
         }
     }
 }
