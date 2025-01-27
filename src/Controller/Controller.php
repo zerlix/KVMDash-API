@@ -68,6 +68,7 @@ class Controller
         
 
         // return an error if the route is not found
+        http_response_code(404);
         return [
             'status' => 'error',
             'message' => 'Controller: Route not found'

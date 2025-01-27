@@ -40,6 +40,7 @@ class HostController
             return $this->diskModel->handle($route, $method);
         }
 
+        http_response_code(404);
         return [
             'status' => 'error',
             'message' => 'HostController: Route not found'
