@@ -42,6 +42,7 @@ class QemuController
             return $this->stopModel->handle($route, $method, $domain);
         }
 
+        http_response_code(404);
         return [
             'status' => 'error',
             'message' => 'QemuController: Route not found'
