@@ -4,7 +4,12 @@ namespace Zerlix\KvmDash\Api\Controller;
 
 class AuthController
 {
-    private $tokenFile = '../../token_file.json';
+    private $tokenFile;
+
+    public function __construct()
+    {
+        $this->tokenFile = __DIR__ . '/../../tmp/token_file.json';
+    }
 
     public function login(string $username, string $password): array
     {

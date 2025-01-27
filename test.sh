@@ -2,6 +2,11 @@
 
 # Login und Token abrufen
 response=$(curl -s -X POST http://kvmdash.back/api/login -H "Content-Type: application/json" -d '{"username": "testuser", "password": "password"}')
+
+# Debugging-Ausgabe der Antwort
+echo "Antwort: $response"
+
+# Token extrahieren
 token=$(echo $response | jq -r '.token')
 
 # Überprüfen, ob der Token erfolgreich abgerufen wurde
