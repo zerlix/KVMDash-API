@@ -46,7 +46,8 @@ class Controller
 
         // Check if token is provided and valid
         $headers = getallheaders();
-        $token = $headers['Authorization'] ?? '';
+        $authHeader = $headers['Authorization'] ?? '';
+        $token = str_replace('Bearer ', '', $authHeader);
         if (!$token || !$this->authController->verifyToken($token)) {
             http_response_code(401);
             return ['status' => 'error', 'message' => 'Unauthorized'];
