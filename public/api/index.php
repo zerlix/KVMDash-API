@@ -14,6 +14,7 @@ if (getenv('DEBUG') === 'true') {
     error_reporting(E_ALL);
 } 
 
+//var_dump(getenv());
 
 // ip check
 $allowedIps = explode(',', getenv('ALLOWED_IPS'));
