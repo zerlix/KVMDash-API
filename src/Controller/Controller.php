@@ -28,7 +28,7 @@ class Controller
 
 
         // validate method
-        if (!in_array($method, ['GET', 'POST', 'PUT', 'DELETE'])) {
+        if (!in_array($method, ['GET', 'POST', 'PUT', 'OPTIONS', 'DELETE'])) {
             return [
                 'status' => 'error',
                 'message' => 'Invalid HTTP method'
