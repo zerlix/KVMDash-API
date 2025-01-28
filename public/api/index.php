@@ -37,6 +37,7 @@ foreach ($allowedIps as $allowedIp) {
     }
 }
 
+// If IP is not allowed, return 403
 if (!$ipAllowed) {
     http_response_code(403);
     echo json_encode(['error' => 'Forbidden']);

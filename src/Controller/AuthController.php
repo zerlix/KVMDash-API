@@ -6,11 +6,14 @@ class AuthController
 {
     private $tokenFile;
 
+
     public function __construct()
     {
         $this->tokenFile = __DIR__ . '/../../tmp/token_file.json';
     }
 
+    
+    // login
     public function login(string $username, string $password): array
     {
         $envUser = $_ENV['API_USER'] ?? null;
@@ -31,6 +34,8 @@ class AuthController
         return ['status' => 'success', 'token' => $token];
     }
 
+
+    // store token in file
     private function storeToken(string $token, string $username): void
     {
         $tokens = $this->loadTokens();
@@ -38,6 +43,8 @@ class AuthController
         file_put_contents($this->tokenFile, json_encode($tokens));
     }
 
+
+    // load tokens from file
     private function loadTokens(): array
     {
         if (!file_exists($this->tokenFile)) {
@@ -48,6 +55,7 @@ class AuthController
         return $tokens ?? [];
     }
 
+    // check if token is valid
     public function verifyToken(string $token): bool
     {
         $tokens = $this->loadTokens();
