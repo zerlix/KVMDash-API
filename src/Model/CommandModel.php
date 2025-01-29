@@ -9,9 +9,7 @@ abstract class CommandModel
     {
         try {
 
-            // validate the command
-            $this->validateCommand($command);
-
+           
             // file descriptors
             $descriptorspec = [
                 0 => ["pipe", "r"],  // stdin
@@ -58,13 +56,5 @@ abstract class CommandModel
         }
     }
 
-    // validate command
-    private function validateCommand(array $command): void
-    {
-        foreach ($command as $cmd) {
-            if (!preg_match('/^[a-zA-Z0-9_\-\/\s:.]+$/', $cmd)) {
-                throw new Exception('Invalid command');
-            }
-        }
-    }
+
 }
