@@ -18,7 +18,7 @@ class HostMemModel extends CommandModel
                 'free' => $matches[3],
                 'shared' => $matches[4],
                 'buff_cache' => $matches[5],
-                'available' => $matches[7] // Korrigiert, um die richtige Spalte zu erfassen
+                'available' => $matches[7] 
             ];
             return ['status' => 'success', 'data' => $formattedOutput];
         } else {
