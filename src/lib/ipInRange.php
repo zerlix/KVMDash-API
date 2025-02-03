@@ -1,24 +1,39 @@
 <?php
+//declare(strict_types=1);
+
 /**
- * Check if an IP address is in a given range.
- *
- * This function checks if an IP address is within a specified range.
- * 
- * @param string $ip The IP address to check.
- * @param string $range The IP range to check against.
- * @return bool True if the IP address is in the range, false otherwise.
+ * Check if an IP is in a given range
+ * @param string $ip IP address to check
+ * @param string $range IP range to check against
+ * @return bool true if IP is in range, false otherwise
  */
-
-function ipInRange($ip, $range) {
-    if (strpos($range, '/') === false) {
-        return $ip === $range;
+function ipInRange(string $ip, string $range): bool
+{
+    if (strpos($range, '/') !== false) {
+        // $range is in CIDR format
+        list($range, $netmask) = explode('/', $range, 2);
+        $range_decimal = ip2long($range);
+        $ip_decimal = ip2long($ip);
+        $wildcard_decimal = pow(2, (32 - (int)$netmask)) - 1;
+        $netmask_decimal = ~$wildcard_decimal;
+        
+        return ($ip_decimal & $netmask_decimal) == ($range_decimal & $netmask_decimal);
     }
-
-    list($range, $netmask) = explode('/', $range, 2);
-    $rangeDecimal = ip2long($range);
-    $ipDecimal = ip2long($ip);
-    $wildcardDecimal = pow(2, (32 - $netmask)) - 1;
-    $netmaskDecimal = ~$wildcardDecimal;
-
-    return ($ipDecimal & $netmaskDecimal) === ($rangeDecimal & $netmaskDecimal);
+    
+    // Range might be 127.0.0.*
+    if (strpos($range, '*') !== false) {
+        $lower = str_replace('*', '0', $range);
+        $upper = str_replace('*', '255', $range);
+        $range = "$lower-$upper";
+    }
+    
+    if (strpos($range, '-') !== false) {
+        list($lower, $upper) = explode('-', $range, 2);
+        $lower_decimal = (int)ip2long($lower);
+        $upper_decimal = (int)ip2long($upper);
+        $ip_decimal = (int)ip2long($ip);
+        return ($ip_decimal >= $lower_decimal && $ip_decimal <= $upper_decimal);
+    }
+    
+    return false;
 }

@@ -10,5 +10,8 @@
             "name": "Zerlix",
             "email": "t.hemm@t-online.de"
         }
-    ]
+    ],
+    "require-dev": {
+        "phpstan/phpstan": "^2.1"
+    }
 }
