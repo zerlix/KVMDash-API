@@ -1,15 +1,14 @@
 <?php
-
+declare(strict_types=1);
 namespace Zerlix\KvmDash\Api\Model;
+
 use Exception;
 
-abstract class CommandModel 
+class CommandModel
 {
-    protected function executeCommand(array $command): array 
+    protected function executeCommand(array $command): array
     {
         try {
-
-           
             // file descriptors
             $descriptorspec = [
                 0 => ["pipe", "r"],  // stdin
@@ -17,12 +16,15 @@ abstract class CommandModel
                 2 => ["pipe", "w"]   // stderr
             ];
 
+            // Befehl als String zusammenfügen
+            $commandString = implode(' ', $command);
+
             // execute the command
-            $process = proc_open(implode(' ', $command), $descriptorspec, $pipes);    
+            $process = proc_open($commandString, $descriptorspec, $pipes);    
             
             // check if the command was executed successfully
             if (!is_resource($process)) {
-                throw new Exception("Unable to execute command: $command");
+                throw new Exception("Unable to execute command: $commandString");
             }
 
             // read the output
@@ -41,20 +43,12 @@ abstract class CommandModel
             // close the process
             $returnVar = proc_close($process);
             if ($returnVar !== 0) {
-                throw new Exception($errorOutput);
+                throw new Exception("Command returned non-zero exit code: $returnVar");
             }
 
-            // return the output
             return ['status' => 'success', 'output' => $output];
-
-          // catch any exceptions  
         } catch (Exception $e) {
-            return [
-                'status' => 'error',
-                'message' => $e->getMessage()
-            ];
+            return ['status' => 'error', 'message' => $e->getMessage()];
         }
     }
-
-
 }
