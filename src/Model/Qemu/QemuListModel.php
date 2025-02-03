@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace Zerlix\KvmDash\Api\Model\Qemu;
 
@@ -10,6 +11,8 @@ class QemuListModel extends CommandModel
 
     public function handle(string $route, string $method): array
     {
+        $formattedOutput = [];
+
         // execute the virsh domstats command and return the formated output
         $response =  $this->executeCommand(['virsh', '-c', $this->uri, 'domstats']);
         if ($response['status'] === 'success') {
