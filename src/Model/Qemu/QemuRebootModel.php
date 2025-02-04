@@ -7,7 +7,16 @@ use Zerlix\KvmDash\Api\Model\CommandModel;
 
 class QemuRebootModel extends CommandModel
 {
-    private $uri = 'qemu:///system';
+    private string $uri = 'qemu:///system';
+
+    /**
+     * Handle the QEMU start command
+     * 
+     * @param string $route
+     * @param string $method
+     * @param string|null $domain
+     * @return array<string, mixed>
+     */
 
     public function handle(string $route, string $method, ?string $domain = null): array
     {
