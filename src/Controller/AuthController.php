@@ -1,10 +1,11 @@
 <?php
+declare(strict_types=1);
 
 namespace Zerlix\KvmDash\Api\Controller;
 
 class AuthController
 {
-    private $tokenFile;
+    private string  $tokenFile;
 
 
     public function __construct()
@@ -13,7 +14,13 @@ class AuthController
     }
 
     
-    // login
+    /**
+     * Handle the login request
+     * 
+     * @param string $username
+     * @param string $password
+     * @return array<string, mixed>
+     */
     public function login(string $username, string $password): array
     {
         $envUser = $_ENV['API_USER'] ?? null;
@@ -44,7 +51,11 @@ class AuthController
     }
 
 
-    // load tokens from file
+    /**
+     * Load tokens from file
+     * 
+     * @return array<string, array<string, mixed>>
+     */
     private function loadTokens(): array
     {
         if (!file_exists($this->tokenFile)) {
@@ -55,7 +66,12 @@ class AuthController
         return $tokens ?? [];
     }
 
-    // check if token is valid
+        /**
+     * Check if token is valid
+     * 
+     * @param string $token
+     * @return bool
+     */
     public function verifyToken(string $token): bool
     {
         $tokens = $this->loadTokens();
