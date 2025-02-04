@@ -9,10 +9,10 @@ use Zerlix\KvmDash\Api\Model\Host\HostInfoModel;
 
 class HostController
 {
-    private $cpuModel;
-    private $memModel;
-    private $diskModel;
-    private $infoModel;
+    private HostCpuModel $cpuModel;
+    private HostMemModel $memModel;
+    private HostDiskModel $diskModel;
+    private HostInfoModel $infoModel;
 
     public function __construct()
     {
@@ -23,6 +23,13 @@ class HostController
         
     }
 
+    /**
+     * Handle the host API requests
+     * 
+     * @param string $route
+     * @param string $method
+     * @return array<string, mixed>
+     */
     public function handle(string $route, string $method): array
     {
         // remove the host prefix from the route
