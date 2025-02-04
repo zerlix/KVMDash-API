@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Zerlix\KvmDash\Api\Model\Qemu;
@@ -7,8 +8,15 @@ use Zerlix\KvmDash\Api\Model\CommandModel;
 
 class QemuListModel extends CommandModel
 {
-    private $uri = 'qemu:///system';
+    private string $uri = 'qemu:///system';
 
+    /**
+     * Handle the QEMU list request
+     * 
+     * @param string $route
+     * @param string $method
+     * @return array<string, mixed>
+     */
     public function handle(string $route, string $method): array
     {
         $formattedOutput = [];
@@ -19,10 +27,14 @@ class QemuListModel extends CommandModel
             $formattedOutput = $this->formatOutput($response['output']);
         }
         return ['status' => 'success', 'data' => $formattedOutput];
-
     }
 
-    // parse the output of the virsh domstats command
+    /**
+     * Parse the output of the virsh domstats command
+     * 
+     * @param string $output
+     * @return array<string, array<string, string>>
+     */
     private function formatOutput(string $output): array
     {
         $result = [];

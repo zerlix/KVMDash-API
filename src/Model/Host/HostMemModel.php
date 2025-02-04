@@ -1,10 +1,19 @@
 <?php
+declare(strict_types=1);
 
 namespace Zerlix\KvmDash\Api\Model\Host;
+
 use Zerlix\KvmDash\Api\Model\CommandModel;
 
 class HostMemModel extends CommandModel
 {
+    /**
+     * Handle the memory statistics request
+     * 
+     * @param string $route
+     * @param string $method
+     * @return array<string, mixed>
+     */
     public function handle(string $route, string $method): array
     {
         $output = $this->executeCommand(['free', '-h', '-t', '-w']);
@@ -18,7 +27,7 @@ class HostMemModel extends CommandModel
                 'free' => $matches[3],
                 'shared' => $matches[4],
                 'buff_cache' => $matches[5],
-                'available' => $matches[7] 
+                'available' => $matches[7]
             ];
             return ['status' => 'success', 'data' => $formattedOutput];
         } else {

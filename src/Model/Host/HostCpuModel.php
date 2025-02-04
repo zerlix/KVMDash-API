@@ -1,19 +1,26 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Zerlix\KvmDash\Api\Model\Host;
 
 use Zerlix\KvmDash\Api\Model\CommandModel;
 
 class HostCpuModel extends CommandModel
 {
+    /**
+     * Get CPU times
+     * 
+     * @return array<int, array<string, int|string>>
+     */
     private function getCpuTimes(): array
     {
         $cmd = 'cat /proc/stat | grep "^cpu" | awk \'{print $1, $2, $3, $4, $5, $6, $7, $8}\'';
         $output = $this->executeCommand([$cmd]);
-        
+
         if ($output['status'] === 'success') {
             $lines = explode("\n", trim($output['output']));
-            $cpuTimes = array_map(function($line) {
+            $cpuTimes = array_map(function ($line) {
                 $parts = explode(' ', $line);
                 return [
                     'cpu' => $parts[0],
@@ -28,10 +35,17 @@ class HostCpuModel extends CommandModel
             }, $lines);
             return $cpuTimes;
         }
-        
+
         return [];
     }
 
+    /**
+     * Handle the CPU statistics request
+     * 
+     * @param string $route
+     * @param string $method
+     * @return array<string, mixed>
+     */
     public function handle(string $route, string $method): array
     {
         $cpuTimes1 = $this->getCpuTimes();

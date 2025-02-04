@@ -1,11 +1,19 @@
 <?php
+
 declare(strict_types=1);
+
 namespace Zerlix\KvmDash\Api\Model;
 
 use Exception;
 
 class CommandModel
 {
+    /**
+     * Execute a command and return the output
+     * 
+     * @param array<int, string> $command
+     * @return array<string, mixed>
+     */
     protected function executeCommand(array $command): array
     {
         try {
@@ -20,8 +28,8 @@ class CommandModel
             $commandString = implode(' ', $command);
 
             // execute the command
-            $process = proc_open($commandString, $descriptorspec, $pipes);    
-            
+            $process = proc_open($commandString, $descriptorspec, $pipes);
+
             // check if the command was executed successfully
             if (!is_resource($process)) {
                 throw new Exception("Unable to execute command: $commandString");
@@ -29,10 +37,10 @@ class CommandModel
 
             // read the output
             $output = stream_get_contents($pipes[1]);
-            
+
             // read the error output
             $errorOutput = stream_get_contents($pipes[2]);
-            
+
             // close the pipes
             foreach ($pipes as $pipe) {
                 if (is_resource($pipe)) {
