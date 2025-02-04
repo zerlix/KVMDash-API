@@ -8,9 +8,9 @@ use Zerlix\KvmDash\Api\Controller\AuthController;
 
 class Controller
 {
-    private $hostController;
-    private $qemuController;
-    private $authController;
+    private HostController $hostController;
+    private QemuController $qemuController;
+    private AuthController $authController;
 
     public function __construct()
     {
@@ -20,7 +20,13 @@ class Controller
     }
 
 
-    
+    /**
+     * Handle the API requests
+     * 
+     * @param string $route
+     * @param string $method
+     * @return array<string, mixed>
+     */    
     public function handle(string $route, string $method): array
     {
         // remove the /api/ prefix from the route
