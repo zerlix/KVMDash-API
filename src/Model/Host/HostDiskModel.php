@@ -6,12 +6,19 @@ use Zerlix\KvmDash\Api\Model\CommandModel;
 
 class HostDiskModel extends CommandModel
 {
+    /**
+     * Handle the disk routes
+     * 
+     * @param string $route
+     * @param string $method
+     * @return array<string, mixed>
+     */
     public function handle(string $route, string $method): array
     {
-        // handle the disk routes
         if ($route === 'disk' && $method === 'GET') {
+       
             $response = $this->executeCommand(['df', '-h', '-x', 'devtmpfs', '-x', 'tmpfs']);
-            //var_dump($response);
+       
             if ($response['status'] === 'success') {
                 $formattedOutput = $this->formatOutput($response['output']);
                 return ['status' => 'success', 'data' => $formattedOutput];
@@ -26,6 +33,12 @@ class HostDiskModel extends CommandModel
         ];
     }
 
+    /**
+     * Parse the output of the df command
+     * 
+     * @param string $output
+     * @return list<array<string>>
+     */
     private function formatOutput(string $output): array
     {
         $lines = explode("\n", trim($output));
