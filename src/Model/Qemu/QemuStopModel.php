@@ -6,9 +6,9 @@ use Zerlix\KvmDash\Api\Model\CommandModel;
 
 class QemuStopModel extends CommandModel
 {
-    private $uri = 'qemu:///system';
+    private string $uri = 'qemu:///system';
 
-    public function handle(string $route, string $method, string $domain): array
+    public function handle(string $route, string $method, ?string $domain = NULL): array
     {
         if (!$domain) {
             return ['status' => 'error', 'message' => 'Domain nicht angegeben'];
