@@ -5,7 +5,7 @@
  * @param string $filePath The path to the .env file.
  * @throws Exception If the .env file does not exist or cannot be read.
  */
-function loadEnv(string $filePath) {
+function loadEnv(string $filePath) : void {
     if (!file_exists($filePath) || !is_readable($filePath)) {
         throw new Exception('.env file not found or not readable');
     }
