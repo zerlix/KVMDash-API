@@ -10,10 +10,10 @@ use Zerlix\KvmDash\Api\Model\Qemu\QemuRebootModel;
 
 class QemuController
 {
-    private $listModel;
-    private $startModel;
-    private $stopModel;
-    private $rebootModel;
+    private QemuListModel $listModel;
+    private QemuStartModel $startModel;
+    private QemuStopModel $stopModel;
+    private QemuRebootModel $rebootModel;
 
     public function __construct()
     {
@@ -23,6 +23,14 @@ class QemuController
         $this->rebootModel = new QemuRebootModel();
     }
 
+    /**
+    * Handle the QEMU API requests
+    * 
+    * @param string $route
+    * @param string $method
+    * @return array<string, mixed>
+    */
+    
     public function handle(string $route, string $method): array
     {
         // remove the qemu prefix from the route
