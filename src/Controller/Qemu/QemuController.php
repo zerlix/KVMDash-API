@@ -33,7 +33,6 @@ class QemuController
             return $this->listModel->handle($route, $method);
         }
 
-        var_dump($method);
         // api/qemu/start/{domain}
         if (strpos($route, 'start') === 0 && $method === 'POST') {
             $domain = substr($route, strlen('start/'));
