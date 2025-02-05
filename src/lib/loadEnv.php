@@ -6,11 +6,11 @@
  * @throws Exception If the .env file does not exist or cannot be read.
  */
 function loadEnv(string $filePath) : void {
+
     if (!file_exists($filePath) || !is_readable($filePath)) {
         throw new Exception('.env file not found or not readable');
     }
 
-    
     $lines = file($filePath, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
     if ($lines === false) {
         throw new Exception('Failed to read .env file');
@@ -27,8 +27,6 @@ function loadEnv(string $filePath) : void {
         if (count($parts) === 2) {
             $key = trim($parts[0]);
             $value = trim($parts[1]);
-
-            // Optional: Remove quotes around the value
             $value = trim($value, '"\'');
 
             // Set variable in environment
