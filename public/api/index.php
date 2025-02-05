@@ -33,15 +33,25 @@ if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
 
 
 // ip check
-$allowedIps = explode(',', getenv('ALLOWED_IPS'));
+$allowedIpsEnv = getenv('ALLOWED_IPS');
+if ($allowedIpsEnv === false) {
+    http_response_code(500);
+    echo json_encode(['error' => 'ALLOWED_IPS environment variable not set']);
+    exit();
+}
+
+$allowedIps = explode(',', $allowedIpsEnv);
 $clientIp = $_SERVER['REMOTE_ADDR'] ?? '';
 $ipAllowed = false;
+
 foreach ($allowedIps as $allowedIp) {
     if (ipInRange($clientIp, $allowedIp)) {
         $ipAllowed = true;
         break;
     }
 }
+
+
 
 // If IP is not allowed, return 403
 if (!$ipAllowed) {
