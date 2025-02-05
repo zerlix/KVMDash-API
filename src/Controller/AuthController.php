@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Zerlix\KvmDash\Api\Controller;
@@ -13,7 +14,7 @@ class AuthController
         $this->tokenFile = __DIR__ . '/../../tmp/token_file.json';
     }
 
-    
+
     /**
      * Handle the login request
      * 
@@ -62,11 +63,16 @@ class AuthController
             return [];
         }
 
-        $tokens = json_decode(file_get_contents($this->tokenFile), true);
+        $content = file_get_contents($this->tokenFile);
+        if ($content === false) {
+            return [];
+        }
+
+        $tokens = json_decode($content, true);
         return $tokens ?? [];
     }
-
-        /**
+    
+    /**
      * Check if token is valid
      * 
      * @param string $token
