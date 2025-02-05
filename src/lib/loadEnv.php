@@ -10,7 +10,11 @@ function loadEnv(string $filePath) : void {
         throw new Exception('.env file not found or not readable');
     }
 
+    
     $lines = file($filePath, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
+    if ($lines === false) {
+        throw new Exception('Failed to read .env file');
+    }
 
     foreach ($lines as $line) {
         // Ignore comments
