@@ -59,7 +59,7 @@ class HostDiskModel extends CommandModel
                 $values[] = substr($line, strrpos($line, ' ') + 1);
                 
                 $combined = array_combine($headers, $values);
-                if ($combined === false) {
+                if (!$combined) {
                     throw new \RuntimeException('Failed to combine headers and values');
                 }
                 
