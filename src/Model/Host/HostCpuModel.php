@@ -59,10 +59,10 @@ class HostCpuModel extends CommandModel
         $cpuData = [];
         foreach ($cpuTimes1 as $index => $cpu1) {
             $cpu2 = $cpuTimes2[$index];
-            $total1 = array_sum(array_slice($cpu1, 1));
-            $total2 = array_sum(array_slice($cpu2, 1));
+            $total1 = (int)array_sum(array_slice($cpu1, 1));
+            $total2 = (int)array_sum(array_slice($cpu2, 1));
             $totalDiff = $total2 - $total1;
-            $idleDiff = $cpu2['idle'] - $cpu1['idle'];
+            $idleDiff = (int)$cpu2['idle'] - (int)$cpu1['idle'];
             $usage = 100 * ($totalDiff - $idleDiff) / $totalDiff;
 
             $cpuData[] = [

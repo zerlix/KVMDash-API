@@ -26,7 +26,7 @@ class Controller
      * @param string $route
      * @param string $method
      * @return array<string, mixed>
-     */    
+     */
     public function handle(string $route, string $method): array
     {
         // remove the /api/ prefix from the route
@@ -43,7 +43,12 @@ class Controller
 
         // Handle login
         if ($route === 'login' && $method === 'POST') {
-            $input = json_decode(file_get_contents('php://input'), true);
+            //$input = json_decode(file_get_contents('php://input'), true);
+            $rawInput = file_get_contents('php://input');
+            if ($rawInput === false) {
+                throw new \RuntimeException('Failed to read input stream');
+            }
+            $input = json_decode($rawInput, true);
             $username = $input['username'] ?? '';
             $password = $input['password'] ?? '';
             return $this->authController->login($username, $password);
@@ -71,7 +76,7 @@ class Controller
             return $this->qemuController->handle($route, $method);
         }
 
-        
+
 
         // return an error if the route is not found
         http_response_code(404);
