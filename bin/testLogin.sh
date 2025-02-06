@@ -1,23 +1,24 @@
 #!/bin/bash
 
-# Login und Token abrufen
-response=$(curl -s -X POST http://kvmdash.back/api/login -H "Content-Type: application/json" -d '{"username": "testuser", "password": "test"}')
+# Login und Token abrufen (exakt wie in Postman)
+response=$(curl -s -X POST http://kvmdash.back/api/login \
+  -H "Content-Type: application/json" \
+  -d '{"username":"testuser","password":"test"}')
 
-# Debugging-Ausgabe der Antwort
-echo "Antwort: $response"
+echo "Login Response: $response"
 
 # Token extrahieren
-token=$(echo $response | jq -r '.token')
+token=$(echo "$response" | jq -r '.token')
 
-# Überprüfen, ob der Token erfolgreich abgerufen wurde
 if [ "$token" == "null" ]; then
-  echo "Login fehlgeschlagen: $(echo $response | jq -r '.message')"
+  echo "Login fehlgeschlagen"
   exit 1
 fi
 
-echo "Token: $token"
+echo "Token erhalten: $token"
 
-# Authentifizierte Anfrage senden
-auth_response=$(curl -s -X GET http://kvmdash.back/api/host/mem -H "Authorization: Bearer $token")
+# Test der authentifizierten Anfrage
+auth_response=$(curl -s -X GET http://kvmdash.back/api/host/mem \
+  -H "Authorization: Bearer $token")
 
-echo "Antwort: $auth_response"
+echo "Authentifizierte Antwort: $auth_response"
