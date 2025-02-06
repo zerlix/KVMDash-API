@@ -73,12 +73,10 @@ class AuthController
 
         /** @var array<string, array<string, mixed>>|null $tokens */
         $tokens = json_decode($content, true);
-
         if ($tokens === null) {
             return [];
         }
 
-        // Die Struktur ist durch PHPDoc bereits gesichert
         return $tokens;
     }
 
