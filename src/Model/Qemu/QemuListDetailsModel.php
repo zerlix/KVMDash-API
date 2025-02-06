@@ -32,7 +32,12 @@ class QemuListDetailsModel extends CommandModel
         }
 
         // XML parsen
-        $xml = @simplexml_load_string($response['output']);
+        $xmlOutput = $response['output'] ?? '';
+        if (!is_string($xmlOutput)) {
+            return ['status' => 'error', 'message' => 'Ungültiges XML Format'];
+        }
+
+        $xml = @simplexml_load_string($xmlOutput);
         if ($xml === false) {
             return ['status' => 'error', 'message' => 'Ungültiges XML Format'];
         }
@@ -57,10 +62,11 @@ class QemuListDetailsModel extends CommandModel
         // Agent-Details abrufen
         $commandString = "sh -c " . escapeshellarg("virsh -c qemu:///system qemu-agent-command $domain '{\"execute\":\"guest-network-get-interfaces\"}' | jq .");
         $agentResponse = $this->executeCommand([$commandString]);
-        
+
         // Wenn der Befehl erfolgreich war, Output decodieren
-        if ($agentResponse['status'] === 'success' && isset($agentResponse['output'])) {
-            $data = json_decode($agentResponse['output'], true);
+        $agentOutput = $agentResponse['output'] ?? '';
+        if ($agentResponse['status'] === 'success' && is_string($agentOutput)) {
+            $data = json_decode($agentOutput, true);
         } else {
             // Fehlerfall: Leeres Netzwerk-Array
             $data = ['return' => []];
@@ -70,7 +76,7 @@ class QemuListDetailsModel extends CommandModel
         if (isset($data['return']) && is_array($data['return'])) {
             foreach ($data['return'] as $interface) {
                 // Loopback (lo) überspringen
-                if (isset($interface['name']) && $interface['name'] === 'lo') {
+                if (($interface['name'] ?? '') === 'lo') {
                     continue;
                 }
                 $interfaceData = [
@@ -82,8 +88,8 @@ class QemuListDetailsModel extends CommandModel
                     foreach ($interface['ip-addresses'] as $ip) {
                         if (isset($ip['ip-address']) && isset($ip['ip-address-type'])) {
                             $interfaceData['ip_addresses'][] = [
-                                'type'    => $ip['ip-address-type'],
-                                'address' => $ip['ip-address']
+                                'type'    => $ip['ip-address-type'] ?? 'unknown',
+                                'address' => $ip['ip-address'] ?? 'unknown'
                             ];
                         }
                     }
