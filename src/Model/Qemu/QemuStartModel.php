@@ -28,15 +28,17 @@ class QemuStartModel extends CommandModel
         $response = $this->executeCommand(['virsh', '-c', $this->uri, 'start', $domain]);
         
         if ($response['status'] === 'success') {
+            $output = is_string($response['output']) ? trim($response['output']) : '';
             return [
                 'status' => 'success',
-                'data' => trim($response['output'])
+                'data' => $output
+            ];
+        } else {
+            return [
+                'status' => 'error',
+                'message' => 'Fehler beim Starten der Domain',
+                'error' => $response
             ];
         }
-
-        return [
-            'status' => 'error',
-            'message' => $response['message'] ?? 'Unbekannter Fehler'
-        ];
     }
 }
