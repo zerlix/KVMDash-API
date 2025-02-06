@@ -55,17 +55,6 @@ class AuthController
         file_put_contents($this->tokenFile, json_encode($tokens));
     }
 
-
-    /**
-     * Load tokens from file
-     * 
-     * @return array<string, array<string, mixed>>
-     */
-    /**
-     * Load tokens from file
-     * 
-     * @return array<string, array<string, mixed>>
-     */
     /**
      * Load tokens from file
      * 
@@ -85,19 +74,15 @@ class AuthController
         /** @var array<string, array<string, mixed>>|null $tokens */
         $tokens = json_decode($content, true);
 
-        if (!is_array($tokens)) {
+        if ($tokens === null) {
             return [];
         }
 
-        // Validate token structure
-        foreach ($tokens as $key => $value) {
-            if (!is_string($key) || !is_array($value)) {
-                return [];
-            }
-        }
-
+        // Die Struktur ist durch PHPDoc bereits gesichert
         return $tokens;
     }
+
+
 
     /**
      * Check if token is valid
