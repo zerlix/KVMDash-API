@@ -10,16 +10,14 @@ declare(strict_types=1);
  */
 function ipInRange(string $ip, string $range): bool
 {
-
     // Exact IP match check before other checks
     if (trim($range) === trim($ip)) {
         return true;
     }
 
-
     // $range is in CIDR format
-    list($range, $netmask) = explode('/', $range, 2);
     if (strpos($range, '/') !== false) {
+        list($range, $netmask) = explode('/', $range, 2);
         $range_decimal = ip2long($range);
         $ip_decimal = ip2long($ip);
         $wildcard_decimal = pow(2, (32 - (int)$netmask)) - 1;
@@ -43,5 +41,6 @@ function ipInRange(string $ip, string $range): bool
         return ($ip_decimal >= $lower_decimal && $ip_decimal <= $upper_decimal);
     }
 
-    return false;
+    // If no special format matches, try exact match again
+    return trim($range) === trim($ip);
 }
