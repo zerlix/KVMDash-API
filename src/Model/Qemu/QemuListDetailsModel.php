@@ -37,47 +37,57 @@ class QemuListDetailsModel extends CommandModel
             return ['status' => 'error', 'message' => 'Ungültiges XML Format'];
         }
 
-        // Basis-VM-Details
+        // Basis-VM-Details extrahieren
         $vmDetails = [
-            'name' => (string)$xml->name,
-            'memory' => (string)$xml->memory,
-            'vcpu' => (string)$xml->vcpu,
-            'os' => [
+            'name'    => (string)$xml->name,
+            'memory'  => (string)$xml->memory,
+            'vcpu'    => (string)$xml->vcpu,
+            'os'      => [
                 'type' => (string)$xml->os->type,
                 'arch' => (string)$xml->os->type['arch']
             ],
-            'spice' => [
-                'port' => (string)$xml->devices->graphics['port'],
-                'type' => (string)$xml->devices->graphics['type'],
+            'spice'   => [
+                'port'   => (string)$xml->devices->graphics['port'],
+                'type'   => (string)$xml->devices->graphics['type'],
                 'listen' => (string)$xml->devices->graphics['listen']
             ],
             'network' => []
         ];
 
-        // Netzwerkdaten über QEMU Guest Agent abrufen
-        $json = shell_exec("virsh -c qemu:///system qemu-agent-command $domain '{\"execute\":\"guest-network-get-interfaces\"}' | jq .");
-        $data = json_decode($json, true);
+        // Agent-Details abrufen
+        $commandString = "sh -c " . escapeshellarg("virsh -c qemu:///system qemu-agent-command $domain '{\"execute\":\"guest-network-get-interfaces\"}' | jq .");
+        $agentResponse = $this->executeCommand([$commandString]);
+        
+        // Wenn der Befehl erfolgreich war, Output decodieren
+        if ($agentResponse['status'] === 'success' && isset($agentResponse['output'])) {
+            $data = json_decode($agentResponse['output'], true);
+        } else {
+            // Fehlerfall: Leeres Netzwerk-Array
+            $data = ['return' => []];
+        }
 
-        if ($data && isset($data['return']) && is_array($data['return'])) {
+        // Iteriere über die Rückgabe und füge die Netzwerkschnittstellen (außer Loopback) hinzu
+        if (isset($data['return']) && is_array($data['return'])) {
             foreach ($data['return'] as $interface) {
+                // Loopback (lo) überspringen
+                if (isset($interface['name']) && $interface['name'] === 'lo') {
+                    continue;
+                }
                 $interfaceData = [
-                    'name' => $interface['name'] ?? 'unknown',
+                    'name'             => $interface['name'] ?? 'unknown',
                     'hardware_address' => $interface['hardware-address'] ?? 'unknown',
-                    'ip_addresses' => []
+                    'ip_addresses'     => []
                 ];
-
-                // Prüfe, ob IP-Adressen existieren
                 if (isset($interface['ip-addresses']) && is_array($interface['ip-addresses'])) {
                     foreach ($interface['ip-addresses'] as $ip) {
                         if (isset($ip['ip-address']) && isset($ip['ip-address-type'])) {
                             $interfaceData['ip_addresses'][] = [
-                                'type' => $ip['ip-address-type'],
+                                'type'    => $ip['ip-address-type'],
                                 'address' => $ip['ip-address']
                             ];
                         }
                     }
                 }
-
                 $vmDetails['network'][] = $interfaceData;
             }
         }
