@@ -48,6 +48,7 @@ class Controller
             if ($rawInput === false) {
                 throw new \RuntimeException('Failed to read input stream');
             }
+            /** @var array{username?: string, password?: string}|null $input */
             $input = json_decode($rawInput, true);
             $username = $input['username'] ?? '';
             $password = $input['password'] ?? '';
