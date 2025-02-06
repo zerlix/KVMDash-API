@@ -79,8 +79,9 @@ class QemuListDetailsModel extends CommandModel
         // Iteriere über die Rückgabe und füge die Netzwerkschnittstellen (außer Loopback) hinzu
         if (isset($data['return']) && is_array($data['return'])) {
             foreach ($data['return'] as $interface) {
+
                 // Loopback (lo) überspringen
-                if (($interface['name'] ?? '') === 'lo') {
+                if (is_array($interface) && isset($interface['name']) && $interface['name'] === 'lo') {
                     continue;
                 }
                 $interfaceData = [
@@ -88,6 +89,8 @@ class QemuListDetailsModel extends CommandModel
                     'hardware_address' => $interface['hardware-address'] ?? 'unknown',
                     'ip_addresses'     => []
                 ];
+
+
                 if (isset($interface['ip-addresses']) && is_array($interface['ip-addresses'])) {
                     foreach ($interface['ip-addresses'] as $ip) {
                         if (isset($ip['ip-address']) && isset($ip['ip-address-type'])) {
@@ -98,6 +101,7 @@ class QemuListDetailsModel extends CommandModel
                         }
                     }
                 }
+                
                 $vmDetails['network'][] = $interfaceData;
             }
         }
