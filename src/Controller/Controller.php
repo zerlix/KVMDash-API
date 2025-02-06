@@ -43,15 +43,18 @@ class Controller
 
         // Handle login
         if ($route === 'login' && $method === 'POST') {
-            //$input = json_decode(file_get_contents('php://input'), true);
+            
             $rawInput = file_get_contents('php://input');
             if ($rawInput === false) {
                 throw new \RuntimeException('Failed to read input stream');
             }
+            
             /** @var array{username?: string, password?: string}|null $input */
             $input = json_decode($rawInput, true);
+            
             $username = $input['username'] ?? '';
             $password = $input['password'] ?? '';
+            
             return $this->authController->login($username, $password);
         }
 
