@@ -61,6 +61,16 @@ class AuthController
      * 
      * @return array<string, array<string, mixed>>
      */
+    /**
+     * Load tokens from file
+     * 
+     * @return array<string, array<string, mixed>>
+     */
+    /**
+     * Load tokens from file
+     * 
+     * @return array<string, array<string, mixed>>
+     */
     private function loadTokens(): array
     {
         if (!file_exists($this->tokenFile)) {
@@ -72,10 +82,23 @@ class AuthController
             return [];
         }
 
+        /** @var array<string, array<string, mixed>>|null $tokens */
         $tokens = json_decode($content, true);
-        return $tokens ?? [];
+
+        if (!is_array($tokens)) {
+            return [];
+        }
+
+        // Validate token structure
+        foreach ($tokens as $key => $value) {
+            if (!is_string($key) || !is_array($value)) {
+                return [];
+            }
+        }
+
+        return $tokens;
     }
-    
+
     /**
      * Check if token is valid
      * 
