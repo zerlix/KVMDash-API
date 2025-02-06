@@ -79,29 +79,34 @@ class QemuListDetailsModel extends CommandModel
         // Iteriere über die Rückgabe und füge die Netzwerkschnittstellen (außer Loopback) hinzu
         if (isset($data['return']) && is_array($data['return'])) {
             foreach ($data['return'] as $interface) {
-
-                // Loopback (lo) überspringen
-                if (is_array($interface) && isset($interface['name']) && $interface['name'] === 'lo') {
+                if (!is_array($interface) || !isset($interface['name'])) {
                     continue;
                 }
+        
+                // Loopback (lo) überspringen
+                if ($interface['name'] === 'lo') {
+                    continue;
+                }
+        
                 $interfaceData = [
                     'name'             => $interface['name'] ?? 'unknown',
                     'hardware_address' => $interface['hardware-address'] ?? 'unknown',
                     'ip_addresses'     => []
                 ];
-
-
+        
                 if (isset($interface['ip-addresses']) && is_array($interface['ip-addresses'])) {
                     foreach ($interface['ip-addresses'] as $ip) {
-                        if (isset($ip['ip-address']) && isset($ip['ip-address-type'])) {
-                            $interfaceData['ip_addresses'][] = [
-                                'type'    => $ip['ip-address-type'] ?? 'unknown',
-                                'address' => $ip['ip-address'] ?? 'unknown'
-                            ];
+                        if (!is_array($ip) || !isset($ip['ip-address'], $ip['ip-address-type'])) {
+                            continue;
                         }
+        
+                        $interfaceData['ip_addresses'][] = [
+                            'type'    => $ip['ip-address-type'] ?? 'unknown',
+                            'address' => $ip['ip-address'] ?? 'unknown'
+                        ];
                     }
                 }
-                
+        
                 $vmDetails['network'][] = $interfaceData;
             }
         }
