@@ -17,8 +17,11 @@ class HostMemModel extends CommandModel
     public function handle(string $route, string $method): array
     {
         $output = $this->executeCommand(['free', '-h', '-t', '-w']);
-        $outputString = implode("\n", array_map('trim', $output));
-
+        // $outputString = implode("\n", array_map('trim', $output));
+        $outputString = implode("\n", array_map(static function ($line) {
+            return trim((string) $line);
+        }, $output));
+        
         // format the output
         if (preg_match('/Mem:\s+(\S+)\s+(\S+)\s+(\S+)\s+(\S+)\s+(\S+)\s+(\S+)\s+(\S+)/', $outputString, $matches)) {
             $formattedOutput = [
