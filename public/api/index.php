@@ -43,11 +43,12 @@ if ($allowedIpsEnv === false) {
 }
 
 $allowedIps = explode(',', $allowedIpsEnv);
-$clientIp = $_SERVER['REMOTE_ADDR'] ?? '';
+$remoteAddr = $_SERVER['REMOTE_ADDR'] ?? '';
+$clientIp = is_string($remoteAddr) ? $remoteAddr : '';
 $ipAllowed = false;
 
 foreach ($allowedIps as $allowedIp) {
-    if (ipInRange($clientIp, $allowedIp)) {
+    if (ipInRange($clientIp, (string)trim($allowedIp))) {
         $ipAllowed = true;
         break;
     }
@@ -68,16 +69,18 @@ header('Content-Type: application/json');
 
 
 // Route bereinigen und validieren
-$parsedRoute = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
+$requestUri = $_SERVER['REQUEST_URI'] ?? '';
+$parsedRoute = is_string($requestUri) ? parse_url($requestUri, PHP_URL_PATH) : null;
 if (!is_string($parsedRoute)) {
     http_response_code(400);
     echo json_encode(['error' => 'Ungültige Request-URI']);
     exit();
 }
 
-$route = $parsedRoute;
-$method = $_SERVER['REQUEST_METHOD'];
 
+$route = $parsedRoute;
+$requestMethod = $_SERVER['REQUEST_METHOD'] ?? 'GET';
+$method = is_string($requestMethod) ? $requestMethod : 'GET';
 
 // Controller instanzieren
 try {
