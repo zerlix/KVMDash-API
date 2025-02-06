@@ -7,6 +7,7 @@ use Zerlix\KvmDash\Api\Model\Qemu\QemuListModel;
 use Zerlix\KvmDash\Api\Model\Qemu\QemuStartModel;
 use Zerlix\KvmDash\Api\Model\Qemu\QemuStopModel;
 use Zerlix\KvmDash\Api\Model\Qemu\QemuRebootModel;
+use Zerlix\KvmDash\Api\Model\Qemu\QemuListDetailsModel; // Ensure this class exists in the specified namespace
 
 class QemuController
 {
@@ -14,6 +15,7 @@ class QemuController
     private QemuStartModel $startModel;
     private QemuStopModel $stopModel;
     private QemuRebootModel $rebootModel;
+    private QemuListDetailsModel $listDetailModel;
 
     public function __construct()
     {
@@ -21,6 +23,7 @@ class QemuController
         $this->startModel = new QemuStartModel();
         $this->stopModel = new QemuStopModel();
         $this->rebootModel = new QemuRebootModel();
+        $this->listDetailModel = new QemuListDetailsModel();
     }
 
     /**
@@ -39,6 +42,12 @@ class QemuController
         // api/qemu/list
         if ($route === 'list' && $method === 'GET') {
             return $this->listModel->handle($route, $method);
+        }
+
+        // api/qemu/listdetails/{domain}
+        if (strpos($route, 'listdetails/') === 0 && $method === 'GET') {    
+            $domain = substr($route, strlen('listdetails/'));
+            return $this->listDetailModel->handle($route, $method, $domain);
         }
 
         // api/qemu/start/{domain}
