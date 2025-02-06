@@ -27,9 +27,16 @@ class QemuStopModel extends CommandModel
         $response = $this->executeCommand(['virsh', '-c', $this->uri, 'shutdown', $domain]);
         
         if ($response['status'] === 'success') {
+            $output = is_string($response['output']) ? trim($response['output']) : '';
             return [
                 'status' => 'success',
-                'data' => trim($response['output'])
+                'data' => $output
+            ];
+        } else {
+            return [
+                'status' => 'error',
+                'message' => 'Fehler beim Stoppen der Domain',
+                'error' => $response
             ];
         }
 
