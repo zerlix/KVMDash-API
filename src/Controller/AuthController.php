@@ -47,19 +47,41 @@ class AuthController
     }
 
 
-    // store token in file
+    /**
+     * Check if token is valid and delete it 
+     * if it is older than 24 hours
+     * 
+     * @param string $token
+     * @return bool
+     */
+    public function verifyToken(string $token): bool 
+    {
+        $tokens = $this->loadTokens();
+        // Tokens bereinigen und gleichzeitig speichern wenn nötig
+        $tokens = $this->cleanupTokens($tokens);
+        
+        return isset($tokens[$token]);
+    }
+
+
+
     private function storeToken(string $token, string $username): void
     {
         $tokens = $this->loadTokens();
-        $tokens[$token] = ['username' => $username, 'created_at' => time()];
-        file_put_contents($this->tokenFile, json_encode($tokens));
+
+        // Neuen Token hinzufügen
+        $tokens[$token] = [
+            'username' => $username,
+            'created_at' => time()
+        ];
+
+        // Mit Pretty Print speichern für bessere Lesbarkeit
+        file_put_contents(
+            $this->tokenFile,
+            json_encode($tokens, JSON_PRETTY_PRINT)
+        );
     }
 
-    /**
-     * Load tokens from file
-     * 
-     * @return array<string, array<string, mixed>>
-     */
     private function loadTokens(): array
     {
         if (!file_exists($this->tokenFile)) {
@@ -74,6 +96,8 @@ class AuthController
         /** @var array<string, array<string, mixed>>|null $tokens */
         $tokens = json_decode($content, true);
         if ($tokens === null) {
+            // Bei ungültigem JSON-Format: Datei zurücksetzen
+            file_put_contents($this->tokenFile, '{}');
             return [];
         }
 
@@ -82,15 +106,26 @@ class AuthController
 
 
 
-    /**
-     * Check if token is valid
-     * 
-     * @param string $token
-     * @return bool
-     */
-    public function verifyToken(string $token): bool
+    private function cleanupTokens(array $tokens): array
     {
-        $tokens = $this->loadTokens();
-        return isset($tokens[$token]);
+        $now = time();
+        $hasChanges = false;
+        
+        foreach ($tokens as $key => $data) {
+            if (($now - $data['created_at']) > 86400) {
+                unset($tokens[$key]);
+                $hasChanges = true;
+            }
+        }
+        
+        // Nur speichern wenn sich was geändert hat
+        if ($hasChanges) {
+            file_put_contents(
+                $this->tokenFile,
+                json_encode($tokens, JSON_PRETTY_PRINT)
+            );
+        }
+        
+        return $tokens;
     }
 }
