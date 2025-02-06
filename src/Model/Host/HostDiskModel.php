@@ -16,9 +16,10 @@ class HostDiskModel extends CommandModel
     public function handle(string $route, string $method): array
     {
         if ($route === 'disk' && $method === 'GET') {
+            /** @var array{status: string, output: string, message?: string} $response */
             $response = $this->executeCommand(['df', '-h', '-x', 'devtmpfs', '-x', 'tmpfs']);
             if ($response['status'] === 'success') {
-                $formattedOutput = $this->formatOutput($response['output']);
+                $formattedOutput = $this->formatOutput((string)$response['output']);
                 return ['status' => 'success', 'data' => $formattedOutput];
             }
             return $response;
