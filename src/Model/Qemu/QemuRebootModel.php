@@ -28,15 +28,20 @@ class QemuRebootModel extends CommandModel
         $response = $this->executeCommand(['virsh', '-c', $this->uri, 'reboot', $domain]);
         
         if ($response['status'] === 'success') {
+            $output = is_string($response['output']) ? trim($response['output']) : '';
             return [
                 'status' => 'success',
-                'data' => trim($response['output'])
+                'data' => $output
             ];
         }
 
-        return [
-            'status' => 'error',
-            'message' => $response['message'] ?? 'Unbekannter Fehler'
-        ];
+        else {
+            return [
+                'status' => 'error',
+                'message' => 'Fehler beim Neustarten der Domain',
+                'error' => $response
+            ];
+        }
+
     }
 }
