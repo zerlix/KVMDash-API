@@ -21,7 +21,11 @@ class HostInfoModel extends CommandModel
         if ($output['status'] === 'success') {
             $data = json_decode((string)$output['output'], true);
             return ['status' => 'success', 'data' => $data];
+        } else {
+            return [
+                'status' => 'error', 
+                'message' => $output['message'] ?? 'Unknown error'
+            ];
         }
-        return ['status' => 'error', 'message' => $output['message']];
     }
 }
