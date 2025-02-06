@@ -31,6 +31,10 @@ class AuthController
             return ['status' => 'error', 'message' => "Benutzername $username nicht gefunden"];
         }
 
+        if (!is_string($envPassword)) {
+            return ['status' => 'error', 'message' => 'API_PASSWORD nicht gesetzt'];
+        }
+
         if (!password_verify($password, $envPassword)) {
             return ['status' => 'error', 'message' => 'Falsches Passwort'];
         }
