@@ -15,7 +15,10 @@ class HostCpuModel extends CommandModel
      */
     private function getCpuTimes(): array
     {
+        
         $cmd = 'cat /proc/stat | grep "^cpu" | awk \'{print $1, $2, $3, $4, $5, $6, $7, $8}\'';
+        
+        /** @var array{status: string, output: string, message?: string} $output */
         $output = $this->executeCommand([$cmd]);
 
         if ($output['status'] === 'success') {
