@@ -16,6 +16,7 @@ class HostMemModel extends CommandModel
      */
     public function handle(string $route, string $method): array
     {
+        /** @var string[] $output */
         $output = $this->executeCommand(['free', '-h', '-t', '-w']);
         // $outputString = implode("\n", array_map('trim', $output));
         $outputString = implode("\n", array_map(static function ($line) {
