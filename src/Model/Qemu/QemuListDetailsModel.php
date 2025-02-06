@@ -54,7 +54,7 @@ class QemuListDetailsModel extends CommandModel
             'network' => []
         ];
 
-        // 🛜 Netzwerkdaten über QEMU Guest Agent abrufen
+        // Netzwerkdaten über QEMU Guest Agent abrufen
         $json = shell_exec("virsh -c qemu:///system qemu-agent-command $domain '{\"execute\":\"guest-network-get-interfaces\"}' | jq .");
         $data = json_decode($json, true);
 
