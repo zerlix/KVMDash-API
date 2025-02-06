@@ -24,7 +24,7 @@ class QemuListModel extends CommandModel
         // execute the virsh domstats command and return the formated output
         $response =  $this->executeCommand(['virsh', '-c', $this->uri, 'domstats']);
         if ($response['status'] === 'success') {
-            $formattedOutput = $this->formatOutput($response['output']);
+            $formattedOutput = is_string($response['output']) ? $this->formatOutput($response['output']) : [];
         }
         return ['status' => 'success', 'data' => $formattedOutput];
     }
