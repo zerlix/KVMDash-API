@@ -40,9 +40,5 @@ class QemuStopModel extends CommandModel
             ];
         }
 
-        return [
-            'status' => 'error',
-            'message' => $response['message'] ?? 'Unbekannter Fehler'
-        ];
     }
 }
