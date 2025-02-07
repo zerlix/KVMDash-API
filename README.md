@@ -20,14 +20,16 @@ Ein Linux-System mit:
 Eine detaillierte Anleitung zur Installation von KVM und libvirt unter Debian 12 (Bookworm) finden Sie hier: 
 * [Installation von KVM unter Debian 12 Bookworm](https://github.com/zerlix/Howtos/blob/main/KVM_Debian.md)
 
+## Installation
+
+TODO ...
 
 Nach erfolgreicher Installation muss User "www-data" der Gruppe libvirt und kvm hinzugefügt werden.
 ```bash
 usermod -aG libvirt,kvm www-data
 ```
 
-## Ziel
-Das Hauptziel des KVMDash Backends ist es, eine robuste und flexible API bereitzustellen, die die Komplexität bei der Administration von Virtualisierungsumgebungen verringert. Dabei werden Verwaltungs- und Überwachungsfunktionen bereitgestellt, die gleichzeitig leicht zugänglich und intuitiv bedienbar sind.
+
 
 
 
