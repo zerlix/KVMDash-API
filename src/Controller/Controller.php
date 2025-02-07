@@ -43,30 +43,39 @@ class Controller
 
         // Handle login
         if ($route === 'login' && $method === 'POST') {
-            
+
             $rawInput = file_get_contents('php://input');
             if ($rawInput === false) {
                 throw new \RuntimeException('Failed to read input stream');
             }
-            
+
             /** @var array{username?: string, password?: string}|null $input */
             $input = json_decode($rawInput, true);
-            
+
             $username = $input['username'] ?? '';
             $password = $input['password'] ?? '';
-            
+
             return $this->authController->login($username, $password);
         }
 
 
-        // Check if token is provided and valid
         $headers = getallheaders();
         $authHeader = $headers['Authorization'] ?? '';
         $token = str_replace('Bearer ', '', $authHeader);
+
+        // check if the token is valid
         if (!$token || !$this->authController->verifyToken($token)) {
             http_response_code(401);
             return ['status' => 'error', 'message' => 'Unauthorized'];
         }
+
+        // handle logout
+        if ($route === 'logout' && $method === 'POST') {
+            $this->authController->logout($token);
+            return ['status' => 'success', 'message' => 'Token deleted'];
+        }
+
+
 
 
         /* 

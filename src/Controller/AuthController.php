@@ -166,4 +166,30 @@ class AuthController
         }
         return true;
     }
+
+    /**
+     * Handle logout by removing the token
+     * 
+     * @param string $token Token from Authorization header
+     * @return array<string, string> Status response
+     */
+    public function logout(string $token): array
+    {
+        $tokens = $this->loadTokens();
+
+        if (!isset($tokens[$token])) {
+            return ['status' => 'error', 'message' => 'Token nicht gefunden'];
+        }
+
+        // Token löschen
+        unset($tokens[$token]);
+
+        // Tokens speichern
+        file_put_contents(
+            $this->tokenFile,
+            json_encode($tokens, JSON_PRETTY_PRINT)
+        );
+
+        return ['status' => 'success'];
+    }
 }
