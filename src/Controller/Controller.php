@@ -41,7 +41,7 @@ class Controller
             ];
         }
 
-        // Handle login
+        // Handle login no auth required
         if ($route === 'login' && $method === 'POST') {
             return $this->authController->login();
         }
@@ -51,15 +51,17 @@ class Controller
         $headers = getallheaders();
         $authHeader = $headers['Authorization'] ?? '';
         $token = str_replace('Bearer ', '', $authHeader);
-
-        /* 
-            handle the host routes
-        */
+        
+        // check if the token is valid        
         if (!$token || !$this->authController->verifyToken($token)) {
             http_response_code(401);
             return ['status' => 'error', 'message' => 'Unauthorized'];
         }
 
+        
+        /* 
+            handle the host routes
+        */
         if ($route === 'logout' && $method === 'POST') {
             $this->authController->logout($token);
             return ['status' => 'success', 'message' => 'Token deleted'];
