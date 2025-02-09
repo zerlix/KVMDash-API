@@ -58,7 +58,7 @@ class TokenStorage
     {
         $tokens = $this->loadTokens();
         
-        // Tokens bereinigen und gleichzeitig speichern wenn nötig
+        // Cleanup tokens if not in debug mode
         if (getenv('DEBUG') !=='true' ) { 
             $tokens = $this->cleanupTokens($tokens);
         }
