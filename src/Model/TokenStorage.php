@@ -57,9 +57,12 @@ class TokenStorage
     public function verifyToken(string $token): bool
     {
         $tokens = $this->loadTokens();
+        
         // Tokens bereinigen und gleichzeitig speichern wenn nötig
-        $tokens = $this->cleanupTokens($tokens);
-
+        if (getenv('DEBUG') !=='true' ) { 
+            $tokens = $this->cleanupTokens($tokens);
+        }
+        
         return isset($tokens[$token]);
     }
 
