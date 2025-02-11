@@ -12,6 +12,9 @@ https://github.com/zerlix/KVMDash
 * Endpunkte zur Echtzeitüberwachung von Ressourcen wie CPU, Arbeitsspeicher, Festplattenauslastung und weiteren wichtigen Systemmetriken.
 * Bereitstellung von Daten zur Systemleistung für eine optimale Kontrolle und Fehleranalyse.
 
+## Videos
+[![YouTube Video](https://img.youtube.com/vi/bIJdHC3julM/0.jpg)](https://www.youtube.com/watch?v=bIJdHC3julM)
+
 ## Voraussetzung
 Ein Linux-System mit:
 * Installiertem KVM (Kernel-based Virtual Machine).
