@@ -1,9 +1,8 @@
 #!/bin/bash
-BASE_WS_PORT=6080
 echo "Starte WebSocket-Dienste..."
 
 for vm in $(virsh list --name); do
-    # Verbesserte SPICE-Port Extraktion
+    # SPICE-Port Extraktion
     SPICE_PORT=$(virsh -c qemu:///system dumpxml "$vm" | xmllint --xpath "string(//graphics[@type='spice']/@port)" -)
     
     # Validierung
@@ -14,8 +13,8 @@ for vm in $(virsh list --name); do
     
     echo "Debug: SPICE_PORT=$SPICE_PORT für VM $vm"
     
-    # Port-Berechnung und Start
-    WS_PORT=$((BASE_WS_PORT + SPICE_PORT - 5900))
+    # Neue vereinfachte Port-Berechnung: SPICE_PORT + 1000
+    WS_PORT=$((SPICE_PORT + 1000))
     echo "Starte Websockify für $vm: $WS_PORT → $SPICE_PORT"
     
     nohup websockify $WS_PORT localhost:$SPICE_PORT > /dev/null 2>&1 &
