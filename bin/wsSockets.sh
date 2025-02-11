@@ -13,7 +13,6 @@ for vm in $(virsh list --name); do
     
     echo "Debug: SPICE_PORT=$SPICE_PORT für VM $vm"
     
-    # Neue vereinfachte Port-Berechnung: SPICE_PORT + 1000
     WS_PORT=$((SPICE_PORT + 1000))
     echo "Starte Websockify für $vm: $WS_PORT → $SPICE_PORT"
     
