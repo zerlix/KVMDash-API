@@ -132,7 +132,7 @@ class QemuCreateVmModel extends CommandModel
         sleep(2);
     
         // Führe wsSockets.sh aus um WebSocket zu aktualisieren
-        $scriptPath = __DIR__ . '/../../../../bin/wsSockets.sh';
+        $scriptPath = __DIR__ . '/../../../bin/wsSockets.sh';
         $wsResult = $this->executeCommand(['bash', $scriptPath]);
     
         return [
