@@ -24,13 +24,13 @@ class QemuCreateVmModel extends CommandModel
             return ['status' => 'error', 'message' => 'Keine VM-Konfiguration übermittelt'];
         }
 
-        // Validiere erforderliche Felder und Typen
+        // check if all required fields are set
         $validationResult = $this->validateData($data);
         if ($validationResult !== true) {
             return ['status' => 'error', 'message' => $validationResult];
         }
 
-        // Sicheres Type-Casting mit Validierung
+        // typecast values to correct types
         if (!is_string($data['name']) || 
             !is_numeric($data['memory']) || 
             !is_numeric($data['vcpus']) || 
@@ -48,7 +48,7 @@ class QemuCreateVmModel extends CommandModel
         $isoImage = $data['iso_image'];
         $networkBridge = $data['network_bridge'];
 
-        // Erstelle Disk-Image
+        // Create Disk-Image
         $diskPath = "/var/lib/libvirt/images/{$name}.qcow2";
         $createDiskCommand = [
             'qemu-img', 'create', '-f', 'qcow2', $diskPath, "{$diskSize}G"
@@ -59,7 +59,7 @@ class QemuCreateVmModel extends CommandModel
             return $diskResult;
         }
 
-        // Erstelle VM mit virt-install
+        // Create VM mit virt-install
         $virtInstallCommand = [
             'virt-install',
             '--connect', $this->uri,
