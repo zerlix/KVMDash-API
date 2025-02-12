@@ -5,7 +5,7 @@
             <img src="https://github.com/zerlix/KVMDash/raw/main/src/assets/kvmdash.svg" alt="KvmDash Logo" style="max-width: 100%;">
         </td>
         <td style="padding: 10px; vertical-align: middle;">
-            Das KVMDash-API ist eine API, die die Verwaltung von Virtual Machines (VMs) auf Linux-Systemen ermöglicht. 
+            KVMDash-API ist eine API, die die Verwaltung von Virtual Machines (VMs) auf Linux-Systemen ermöglicht. 
             Es bietet Endpunkte zur Steuerung und Überwachung von Virtualisierungsumgebungen und dient als Rückgrat der KVMDash Webanwendung. 
             <br>
             <a href="https://github.com/zerlix/KVMDash">https://github.com/zerlix/KVMDash</a>
