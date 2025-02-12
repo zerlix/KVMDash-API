@@ -7,7 +7,8 @@ use Zerlix\KvmDash\Api\Model\Qemu\QemuListModel;
 use Zerlix\KvmDash\Api\Model\Qemu\QemuStartModel;
 use Zerlix\KvmDash\Api\Model\Qemu\QemuStopModel;
 use Zerlix\KvmDash\Api\Model\Qemu\QemuRebootModel;
-use Zerlix\KvmDash\Api\Model\Qemu\QemuListDetailsModel; // Ensure this class exists in the specified namespace
+use Zerlix\KvmDash\Api\Model\Qemu\QemuListDetailsModel; 
+use Zerlix\KvmDash\Api\Model\Qemu\QemuCreateVmModel;
 
 class QemuController
 {
@@ -16,6 +17,7 @@ class QemuController
     private QemuStopModel $stopModel;
     private QemuRebootModel $rebootModel;
     private QemuListDetailsModel $listDetailModel;
+    private QemuCreateVmModel $createVmModel;
 
     public function __construct()
     {
@@ -24,6 +26,7 @@ class QemuController
         $this->stopModel = new QemuStopModel();
         $this->rebootModel = new QemuRebootModel();
         $this->listDetailModel = new QemuListDetailsModel();
+        $this->createVmModel = new QemuCreateVmModel();
     }
 
     /**
@@ -66,6 +69,11 @@ class QemuController
         if (strpos($route, 'reboot/') === 0 && $method === 'POST') {
             $domain = substr($route, strlen('reboot/'));
             return $this->rebootModel->handle($route, $method, $domain);
+        }
+
+        // api/qemu/create
+        if ($route === 'create' && $method === 'POST') {
+            return $this->createVmModel->handle($route, $method);
         }
 
         http_response_code(404);
