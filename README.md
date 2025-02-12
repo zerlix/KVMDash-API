@@ -24,9 +24,17 @@ Eine detaillierte Anleitung zur Installation von KVM und libvirt unter Debian 12
 
 TODO ...
 
-Nach erfolgreicher Installation muss User "www-data" der Gruppe libvirt und kvm hinzugefügt werden.
+
+Nach erfolgreicher Installation muss User "www-data" der Gruppe libvirt und libvirt-qemu hinzugefügt werden.
+
 ```bash
-usermod -aG libvirt,kvm www-data
+# Füge www-data zur libvirt-Gruppe hinzu
+usermod -a -G libvirt www-data
+usermod -a -G libvirt-qemu www-data
+
+# Setze Gruppenrechte für das Verzeichnis
+chown root:libvirt /var/lib/libvirt/images
+chmod g+rwx /var/lib/libvirt/images
 ```
 
 
