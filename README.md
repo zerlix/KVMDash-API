@@ -13,10 +13,8 @@ https://github.com/zerlix/KVMDash
 * Bereitstellung von Daten zur Systemleistung für eine optimale Kontrolle und Fehleranalyse.
 
 ## Videos
-[![YouTube Video](https://img.youtube.com/vi/bIJdHC3julM/0.jpg)](https://www.youtube.com/watch?v=bIJdHC3julM)
-
 **Erstelle VM**<br/>
-[![YouTube Video](https://img.youtube.com/vi/1ZT04mh86NE/0.jpg)](https://www.youtube.com/watch?v=1ZT04mh86NE)
+https://github.com/user-attachments/assets/a991f259-7aa8-493f-af48-32413d03c780
 
 ## Voraussetzung
 Ein Linux-System mit:
