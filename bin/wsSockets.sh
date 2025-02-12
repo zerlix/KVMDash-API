@@ -1,30 +1,54 @@
 #!/bin/bash
-echo "Starte WebSocket-Dienste..."
 
-for vm in $(virsh list --name); do
-    # SPICE-Port Extraktion
-    SPICE_PORT=$(virsh -c qemu:///system dumpxml "$vm" | xmllint --xpath "string(//graphics[@type='spice']/@port)" -)
+# Debug-Modus nur wenn DEBUG=1 gesetzt ist
+[[ "${DEBUG:-0}" == "1" ]] && set -x
+
+# Basis-Logging-Funktion
+log() {
+    echo "$(date '+%Y-%m-%d %H:%M:%S') - $*"
+}
+
+# Aufräumen nur wenn CLEANUP=1 gesetzt ist
+if [[ "${CLEANUP:-0}" == "1" ]]; then
+    cleanup() {
+        log "Beende WebSocket-Dienste..."
+        pkill -u $(whoami) websockify 2>/dev/null || true
+    }
+    trap cleanup EXIT
+fi
+
+# Prüfe websockify Installation
+which websockify >/dev/null || {
+    log "Fehler: websockify nicht gefunden"
+    exit 1
+}
+
+# Liste alle laufenden VMs
+log "Starte WebSocket-Dienste"
+
+for vm in $(virsh -c qemu:///system list --name); do
+    # Hole SPICE-Port
+    SPICE_PORT=$(virsh -c qemu:///system dumpxml "$vm" | xmllint --xpath "string(//graphics[@type='spice']/@port)" - 2>/dev/null)
     
-    # Validierung
-    if [ -z "$SPICE_PORT" ] || [ "$SPICE_PORT" = "0" ]; then
-        echo "Warnung: Kein gültiger SPICE-Port für VM $vm gefunden"
-        continue
-    fi
-    
-    echo "Debug: SPICE_PORT=$SPICE_PORT für VM $vm"
-    
-    # Neue vereinfachte Port-Berechnung: SPICE_PORT + 1000
-    WS_PORT=$((SPICE_PORT + 1000))
-    echo "Starte Websockify für $vm: $WS_PORT → $SPICE_PORT"
-    
-    nohup websockify $WS_PORT localhost:$SPICE_PORT > /dev/null 2>&1 &
-    
-    if ps aux | grep -v grep | grep -q "websockify $WS_PORT"; then
-        echo "✓ Websockify läuft für $vm auf Port $WS_PORT"
-    else
-        echo "✗ Fehler beim Starten von Websockify für $vm"
+    if [ -n "$SPICE_PORT" ] && [ "$SPICE_PORT" != "0" ]; then
+        WS_PORT=$((SPICE_PORT + 1000))
+        log "Konfiguriere WebSocket für $vm: Port $WS_PORT -> $SPICE_PORT"
+        
+        # Test ob Port frei ist
+        if netstat -tuln 2>/dev/null | grep -q ":$WS_PORT "; then
+            log "WARNUNG: Port $WS_PORT ist bereits belegt"
+            continue
+        fi
+        
+        # Starte websockify
+        websockify -D $WS_PORT localhost:$SPICE_PORT --log-file /tmp/websockify_${vm}.log 2>/dev/null
+        
+        # Prüfe ob Start erfolgreich war
+        sleep 1
+        if pgrep -f "websockify.*$WS_PORT" >/dev/null; then
+            log "✓ WebSocket für $vm erfolgreich gestartet"
+        else
+            log "✗ WebSocket für $vm konnte nicht gestartet werden"
+        fi
     fi
 done
-
-echo -e "\nAktive WebSocket-Verbindungen:"
-netstat -tlpn | grep websockify

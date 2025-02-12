@@ -31,17 +31,29 @@ class QemuCreateVmModel extends CommandModel
             'network_bridge' => 'br0',  // Standard libvirt Network Bridge
             'os_variant' => 'linux2022'  // OS-Typ
         ]; */
+     
+        // Wenn $data null ist, versuche die Daten aus dem Request-Body zu lesen
+        if (!$data) {
+            $rawData = file_get_contents('php://input');
+            $data = json_decode($rawData, true);
+            error_log('Parsed JSON data: ' . print_r($data, true));
+        }
 
         if (!$data) {
             return ['status' => 'error', 'message' => 'Keine VM-Konfiguration übermittelt'];
         }
 
-        // check if all required fields are set
-        $validationResult = $this->validateData($data);
-        if ($validationResult !== true) {
-            return ['status' => 'error', 'message' => $validationResult];
+        // Validierung der erforderlichen Felder
+        $requiredFields = ['name', 'memory', 'vcpus', 'disk_size', 'iso_image', 'network_bridge', 'os_variant'];
+        foreach ($requiredFields as $field) {
+            if (!isset($data[$field])) {
+                return [
+                    'status' => 'error',
+                    'message' => "Fehlende Pflichtangabe: $field",
+                    'received_data' => $data
+                ];
+            }
         }
-
         // typecast values to correct types
         if (
             !is_string($data['name']) ||
@@ -110,7 +122,25 @@ class QemuCreateVmModel extends CommandModel
             "name={$osVariant}"  // Dynamischer OS-Typ
         ];
 
-        return $this->executeCommand($virtInstallCommand);
+        //return $this->executeCommand($virtInstallCommand);
+        $vmResult = $this->executeCommand($virtInstallCommand);
+        if ($vmResult['status'] === 'error') {
+            return $vmResult;
+        }
+    
+        // Warte kurz bis die VM erstellt ist
+        sleep(2);
+    
+        // Führe wsSockets.sh aus um WebSocket zu aktualisieren
+        $scriptPath = __DIR__ . '/../../../../bin/wsSockets.sh';
+        $wsResult = $this->executeCommand(['bash', $scriptPath]);
+    
+        return [
+            'status' => 'success',
+            'message' => 'VM erfolgreich erstellt',
+            'vm_result' => $vmResult,
+            'websocket_status' => $wsResult['status']
+        ];
     }
 
     /**
