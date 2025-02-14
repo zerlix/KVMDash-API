@@ -54,4 +54,5 @@
 .env
 
 # tmp files
-/tmp/*
+/tmp/*.json
+!/tmp/.gitkeep
