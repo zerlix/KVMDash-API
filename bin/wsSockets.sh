@@ -1,7 +1,7 @@
 #!/bin/bash
 echo "Starte WebSocket-Dienste..."
 
-for vm in $(virsh list --name); do
+for vm in $(virsh -c qemu:///system list --name); do
     # SPICE-Port Extraktion
     SPICE_PORT=$(virsh -c qemu:///system dumpxml "$vm" | xmllint --xpath "string(//graphics[@type='spice']/@port)" -)
     
@@ -26,5 +26,3 @@ for vm in $(virsh list --name); do
     fi
 done
 
-echo -e "\nAktive WebSocket-Verbindungen:"
-netstat -tlpn | grep websockify
