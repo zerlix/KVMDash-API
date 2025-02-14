@@ -13,7 +13,6 @@
     </tr>
 </table>
 
-
 ## Features
 
 ### API zur VM Verwaltung
