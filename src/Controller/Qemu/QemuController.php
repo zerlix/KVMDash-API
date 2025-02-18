@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Zerlix\KvmDash\Api\Controller\Qemu;
@@ -7,8 +8,9 @@ use Zerlix\KvmDash\Api\Model\Qemu\QemuListModel;
 use Zerlix\KvmDash\Api\Model\Qemu\QemuStartModel;
 use Zerlix\KvmDash\Api\Model\Qemu\QemuStopModel;
 use Zerlix\KvmDash\Api\Model\Qemu\QemuRebootModel;
-use Zerlix\KvmDash\Api\Model\Qemu\QemuListDetailsModel; 
+use Zerlix\KvmDash\Api\Model\Qemu\QemuListDetailsModel;
 use Zerlix\KvmDash\Api\Model\Qemu\QemuCreateVmModel;
+use Zerlix\KvmDash\Api\Model\Qemu\QemuDeleteModel;
 
 class QemuController
 {
@@ -18,6 +20,7 @@ class QemuController
     private QemuRebootModel $rebootModel;
     private QemuListDetailsModel $listDetailModel;
     private QemuCreateVmModel $createVmModel;
+    private QemuDeleteModel $deleteModel;
 
     public function __construct()
     {
@@ -27,16 +30,17 @@ class QemuController
         $this->rebootModel = new QemuRebootModel();
         $this->listDetailModel = new QemuListDetailsModel();
         $this->createVmModel = new QemuCreateVmModel();
+        $this->deleteModel = new QemuDeleteModel();
     }
 
     /**
-    * Handle the QEMU API requests
-    * 
-    * @param string $route
-    * @param string $method
-    * @return array<string, mixed>
-    */
-    
+     * Handle the QEMU API requests
+     * 
+     * @param string $route
+     * @param string $method
+     * @return array<string, mixed>
+     */
+
     public function handle(string $route, string $method): array
     {
         // remove the qemu prefix from the route
@@ -48,7 +52,7 @@ class QemuController
         }
 
         // api/qemu/listdetails/{domain}
-        if (strpos($route, 'listdetails/') === 0 && $method === 'GET') {    
+        if (strpos($route, 'listdetails/') === 0 && $method === 'GET') {
             $domain = substr($route, strlen('listdetails/'));
             return $this->listDetailModel->handle($route, $method, $domain);
         }
@@ -74,6 +78,12 @@ class QemuController
         // api/qemu/create
         if ($route === 'create' && $method === 'POST') {
             return $this->createVmModel->handle($route, $method);
+        }
+
+        // api/qemu/delete/{domain}
+        if (strpos($route, 'delete/') === 0 && $method === 'POST') {
+            $domain = substr($route, strlen('delete/'));
+            return $this->deleteModel->handle($route, $method, $domain);
         }
 
         http_response_code(404);
