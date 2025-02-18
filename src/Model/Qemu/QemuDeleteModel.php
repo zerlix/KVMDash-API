@@ -8,6 +8,12 @@ use Zerlix\KvmDash\Api\Model\CommandModel;
 class QemuDeleteModel extends CommandModel
 {
     private string $uri = 'qemu:///system';
+    private string $vhdBasePath;
+
+    public function __construct()
+    {
+        $this->vhdBasePath = $_ENV['LIBVIRT_IMAGES_PATH'] ?? '/var/lib/libvirt/images';
+    }
 
     /**
      * @param string $route
@@ -49,7 +55,7 @@ class QemuDeleteModel extends CommandModel
 
         // Optional: VHD-Files löschen
         if ($deleteVhd) {
-            $vhdPath = "/var/lib/libvirt/images/$domain.qcow2";
+            $vhdPath = $this->vhdBasePath . "/$domain.qcow2";
             if (file_exists($vhdPath)) {
                 $vhdResponse = $this->executeCommand(['rm', '-f', $vhdPath]);
                 if ($vhdResponse['status'] !== 'success') {
