@@ -25,7 +25,7 @@ class IsoListModel extends CommandModel
                 'message' => 'ISO-Verzeichnis nicht gefunden'
             ];
         }
-
+    
         $scanResult = scandir($isoPath);
         if ($scanResult === false) {
             return [
@@ -33,15 +33,27 @@ class IsoListModel extends CommandModel
                 'message' => 'Fehler beim Lesen des ISO-Verzeichnisses'
             ];
         }
-
+    
+        // Filtere zuerst die ISO-Dateien
         $isoFiles = array_filter(
             $scanResult,
             fn(string $file): bool => pathinfo($file, PATHINFO_EXTENSION) === 'iso'
         );
-
+    
+        // Dann mappe sie zu den gewünschten Objekten
+        $isoData = array_map(
+            function($file) use ($isoPath) {
+                return [
+                    'name' => $file,
+                    'path' => $isoPath . '/' . $file
+                ];
+            }, 
+            array_values($isoFiles)
+        );
+    
         return [
             'status' => 'success',
-            'data' => array_values($isoFiles)
+            'data' => $isoData
         ];
     }
 }
