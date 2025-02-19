@@ -3,14 +3,18 @@
 namespace Zerlix\KvmDash\Api\Controller\Iso;
 
 use Zerlix\KvmDash\Api\Model\Iso\IsoListModel;
+use Zerlix\KvmDash\Api\Model\Iso\IsoTurnkeyListModel;
+
 
 class IsoController
 {
     private  IsoListModel $listModel;
+    private  IsoTurnkeyListModel $turnkeyListModel;
 
     public function __construct()
     {
         $this->listModel = new IsoListModel();
+        $this->turnkeyListModel = new IsoTurnkeyListModel();
     }
 
     /**
@@ -30,7 +34,7 @@ class IsoController
             return $this->listModel->handle($route, $method);
         }
 
-
+        /** TODO: Implement the following routes
         // api/iso/upload
         if ($route === 'upload' && $method === 'POST') {
             return ['status' => 'success', 'data' => 'ISO upload'];
@@ -39,6 +43,12 @@ class IsoController
         // api/iso/delete
         if ($route === 'delete' && $method === 'DELETE') {
             return ['status' => 'success', 'data' => 'ISO delete'];
+        }
+        */
+
+        // api/iso/turnkey/list
+        if ($route === 'turnkey/list' && $method === 'GET') {
+            return $this->turnkeyListModel->handle($route, $method);
         }
 
         http_response_code(404);
