@@ -20,51 +20,41 @@ class QemuCreateVmModel extends CommandModel
      */
     public function handle(string $route, string $method, ?array $data = null): array
     {
-
-        /** Testdaten
-        $data = [
-            'name' => 'test-vm-' . time(), // Unique Name mit Timestamp
-            'memory' => 2048,              // 2GB RAM
-            'vcpus' => 2,                  // 2 CPUs
-            'disk_size' => 20,             // 20GB Festplatte
-            'iso_image' => '/mnt/raid/CDImages/debian-12.9.0-amd64-netinst.iso', // Pfad zu Ihrer ISO
-            'network_bridge' => 'br0',  // Standard libvirt Network Bridge
-            'os_variant' => 'linux2022'  // OS-Typ
-        ]; */
-     
-        // Wenn $data null ist, versuche die Daten aus dem Request-Body zu lesen
+        // if data is null, try to read data from request body
         if (!$data) {
             $rawData = file_get_contents('php://input');
+            if ($rawData === false) {
+                return ['status' => 'error', 'message' => 'Konnte Request-Body nicht lesen'];
+            }
+            /** @var array<string, mixed>|null */
             $data = json_decode($rawData, true);
-            error_log('Parsed JSON data: ' . print_r($data, true));
         }
 
-        if (!$data) {
+        if (!is_array($data)) {
             return ['status' => 'error', 'message' => 'Keine VM-Konfiguration übermittelt'];
         }
 
-        // Validierung der erforderlichen Felder
-        $requiredFields = ['name', 'memory', 'vcpus', 'disk_size', 'iso_image', 'network_bridge', 'os_variant'];
-        foreach ($requiredFields as $field) {
-            if (!isset($data[$field])) {
-                return [
-                    'status' => 'error',
-                    'message' => "Fehlende Pflichtangabe: $field",
-                    'received_data' => $data
-                ];
-            }
+        // validate data 
+        $validationResult = $this->validateData($data);
+        if ($validationResult !== true) {
+            return [
+                'status' => 'error',
+                'message' => $validationResult
+            ];
         }
-        // typecast values to correct types
-        if (
-            !is_string($data['name']) ||
-            !is_numeric($data['memory']) ||
-            !is_numeric($data['vcpus']) ||
-            !is_numeric($data['disk_size']) ||
-            !is_string($data['iso_image']) ||
-            !is_string($data['network_bridge'])
-        ) {
-            return ['status' => 'error', 'message' => 'Ungültige Datentypen'];
-        }
+
+       
+        /** @var array{
+         *     name: string,
+         *     memory: numeric-string|int,
+         *     vcpus: numeric-string|int,
+         *     disk_size: numeric-string|int,
+         *     iso_image: string,
+         *     network_bridge: string,
+         *     os_variant: string
+         * } $data 
+         */
+        $data = $data;
 
         // Cast values to correct types
         $name = $data['name'];
@@ -73,7 +63,7 @@ class QemuCreateVmModel extends CommandModel
         $diskSize = (string)intval($data['disk_size']);
         $isoImage = $data['iso_image'];
         $networkBridge = $data['network_bridge'];
-        $osVariant = (string)$data['os_variant'];
+        $osVariant = $data['os_variant'];
 
         // get Storage-Pool-Path
         try {
@@ -104,37 +94,36 @@ class QemuCreateVmModel extends CommandModel
             '--connect',
             $this->uri,
             '--name',
-            $name,
+            (string)$name,          
             '--memory',
-            $memory,
+            (string)$memory,        
             '--vcpus',
-            $vcpus,
+            (string)$vcpus,        
             '--disk',
             "path={$diskPath},format=qcow2",
             '--cdrom',
-            $isoImage,
+            (string)$isoImage,     
             '--network',
             "bridge={$networkBridge}",
             '--graphics',
             'spice',
             '--noautoconsole',
             '--osinfo',
-            "name={$osVariant}"  // Dynamischer OS-Typ
+            "name={$osVariant}"   
         ];
 
-        //return $this->executeCommand($virtInstallCommand);
         $vmResult = $this->executeCommand($virtInstallCommand);
         if ($vmResult['status'] === 'error') {
             return $vmResult;
         }
-    
-        // Warte kurz bis die VM erstellt ist
+
+        // wait for creat vm command to finish
         sleep(2);
-    
-        // Führe wsSockets.sh aus um WebSocket zu aktualisieren
+
+        // run wsSockets.sh to update WebSocket
         $scriptPath = __DIR__ . '/../../../bin/wsSockets.sh';
         $wsResult = $this->executeCommand(['bash', $scriptPath]);
-    
+
         return [
             'status' => 'success',
             'message' => 'VM erfolgreich erstellt',
@@ -159,7 +148,6 @@ class QemuCreateVmModel extends CommandModel
             }
         }
 
-        // Validiere Typen
         if (!is_string($data['name'])) {
             return 'Name muss ein String sein';
         }
@@ -192,7 +180,13 @@ class QemuCreateVmModel extends CommandModel
             throw new \RuntimeException('Konnte Storage-Pool-Pfad nicht auslesen');
         }
 
-        $xml = simplexml_load_string($result['output']);
+        /** @var string $output */
+        $output = $result['output'] ?? '';
+        if ($output === '') {
+            throw new \RuntimeException('Keine Ausgabe vom Storage-Pool-Command');
+        }
+
+        $xml = simplexml_load_string($output);
         if (!$xml) {
             throw new \RuntimeException('Ungültiges Storage-Pool XML');
         }
