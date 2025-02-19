@@ -12,7 +12,9 @@ class QemuDeleteModel extends CommandModel
 
     public function __construct()
     {
-        $this->vhdBasePath = $_ENV['LIBVIRT_IMAGES_PATH'] ?? '/var/lib/libvirt/images';
+        /** @var string|false $envPath */
+        $envPath = $_ENV['LIBVIRT_IMAGES_PATH'] ?? false;
+        $this->vhdBasePath = is_string($envPath) ? $envPath : '/var/lib/libvirt/images';
     }
 
     /**
