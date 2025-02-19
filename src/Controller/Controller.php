@@ -5,18 +5,21 @@ namespace Zerlix\KvmDash\Api\Controller;
 use Zerlix\KvmDash\Api\Controller\Host\HostController;
 use Zerlix\KvmDash\Api\Controller\Qemu\QemuController;
 use Zerlix\KvmDash\Api\Controller\AuthController;
+use Zerlix\KvmDash\Api\Controller\Iso\IsoController;
 
 class Controller
 {
     private HostController $hostController;
     private QemuController $qemuController;
     private AuthController $authController;
+    private IsoController $isoController;
 
     public function __construct()
     {
         $this->qemuController = new QemuController();
         $this->hostController = new HostController();
         $this->authController = new AuthController();
+        $this->isoController = new IsoController();
     }
 
 
@@ -76,7 +79,9 @@ class Controller
             return $this->qemuController->handle($route, $method);
         }
 
-
+        if (str_starts_with($route, 'iso')) {
+            return $this->isoController->handle($route, $method);
+        }
 
         // return an error if the route is not found
         http_response_code(404);
