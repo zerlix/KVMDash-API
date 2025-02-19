@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Zerlix\KvmDash\Api\Model\Qemu;
@@ -34,14 +35,18 @@ class QemuDeleteModel extends CommandModel
 
         // VM Status prüfen und ggf. zuerst stoppen
         $statusCommand = $this->executeCommand(['virsh', '-c', $this->uri, 'domstate', $domain]);
-        if ($statusCommand['status'] === 'success' && trim($statusCommand['output']) === 'running') {
-            $stopResponse = $this->executeCommand(['virsh', '-c', $this->uri, 'destroy', $domain]);
-            if ($stopResponse['status'] !== 'success') {
-                return [
-                    'status' => 'error',
-                    'message' => 'Fehler beim Stoppen der VM',
-                    'error' => $stopResponse['error'] ?? 'Unbekannter Fehler'
-                ];
+        if ($statusCommand['status'] === 'success' && isset($statusCommand['output'])) {
+            /** @var string $output */
+            $output = $statusCommand['output'];
+            if (trim($output) === 'running') {
+                $stopResponse = $this->executeCommand(['virsh', '-c', $this->uri, 'destroy', $domain]);
+                if ($stopResponse['status'] !== 'success') {
+                    return [
+                        'status' => 'error',
+                        'message' => 'Fehler beim Stoppen der VM',
+                        'error' => $stopResponse['error'] ?? 'Unbekannter Fehler'
+                    ];
+                }
             }
         }
 
