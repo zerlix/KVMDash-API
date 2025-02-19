@@ -8,7 +8,13 @@ use Exception;
 
 class CommandModel
 {
-
+    
+    /**
+     * Execute a command and return the output
+     * 
+     * @param array<int, string> $command
+     * @return array<string, string|mixed>
+     */
     protected function executeCommand(array $command): array
     {
         try {
