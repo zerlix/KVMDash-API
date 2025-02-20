@@ -64,7 +64,7 @@ class IsoUploadModel extends CommandModel {
             curl_close($ch);
             fclose($fp);
             if ($success) {
-                file_put_contents("%s", json_encode(["status" => "completed"]));
+                file_put_contents("%s", json_encode(["status" => "success"]));
             } else {
                 file_put_contents("%s", json_encode(["status" => "error", "message" => "Download failed"]));
             }
