@@ -9,37 +9,40 @@ use Zerlix\KvmDash\Api\Model\CommandModel;
 class HostCpuModel extends CommandModel
 {
     /**
-     * Get CPU times
+     * Get CPU times from /proc/stat
      * 
      * @return array<int, array<string, int|string>>
      */
     private function getCpuTimes(): array
     {
-        
-        $cmd = 'cat /proc/stat | grep "^cpu" | awk \'{print $1, $2, $3, $4, $5, $6, $7, $8}\'';
-        
-        /** @var array{status: string, output: string, message?: string} $output */
-        $output = $this->executeCommand([$cmd]);
-
-        if ($output['status'] === 'success') {
-            $lines = explode("\n", trim($output['output']));
-            $cpuTimes = array_map(function ($line) {
-                $parts = explode(' ', $line);
-                return [
-                    'cpu' => $parts[0],
-                    'user' => (int)$parts[1],
-                    'nice' => (int)$parts[2],
-                    'system' => (int)$parts[3],
-                    'idle' => (int)$parts[4],
-                    'iowait' => (int)$parts[5],
-                    'irq' => (int)$parts[6],
-                    'softirq' => (int)$parts[7],
-                ];
-            }, $lines);
-            return $cpuTimes;
+        $statContent = @file_get_contents('/proc/stat');
+        if ($statContent === false) {
+            error_log('Failed to read /proc/stat');
+            return [];
         }
 
-        return [];
+        $lines = explode("\n", $statContent);
+        $cpuTimes = [];
+
+        foreach ($lines as $line) {
+            if (preg_match('/^cpu/', $line)) {
+                $parts = preg_split('/\s+/', trim($line));
+                if (count($parts) >= 8) {
+                    $cpuTimes[] = [
+                        'cpu' => $parts[0],
+                        'user' => (int)$parts[1],
+                        'nice' => (int)$parts[2],
+                        'system' => (int)$parts[3],
+                        'idle' => (int)$parts[4],
+                        'iowait' => (int)$parts[5],
+                        'irq' => (int)$parts[6],
+                        'softirq' => (int)$parts[7],
+                    ];
+                }
+            }
+        }
+
+        return $cpuTimes;
     }
 
     /**

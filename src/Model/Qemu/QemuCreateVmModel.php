@@ -92,11 +92,6 @@ class QemuCreateVmModel extends CommandModel
 
         // Wähle die richtige Netzwerkkonfiguration
         if ($networkBridge === 'default') {
-            // Prüfe und aktiviere das default Netzwerk falls nötig
-            $networkStatus = $this->checkAndActivateDefaultNetwork();
-            if ($networkStatus['status'] === 'error') {
-                return $networkStatus;
-            }
             $networkOption = 'network=default';
         } else {
             $networkOption = 'bridge=' . $networkBridge;
@@ -264,42 +259,5 @@ class QemuCreateVmModel extends CommandModel
         }
 
         return $path;
-    }
-
-    /**
-     * Prüft und aktiviert das default Netzwerk falls nötig
-     * 
-     * @return array<string, mixed>
-     */
-    private function checkAndActivateDefaultNetwork(): array
-    {
-        // Prüfe ob das Netzwerk existiert
-        $checkCommand = ['virsh', '--connect', $this->uri, 'net-list', '--all'];
-        $result = $this->executeCommand($checkCommand);
-        
-        if ($result['status'] === 'error') {
-            return ['status' => 'error', 'message' => 'Konnte Netzwerkstatus nicht prüfen'];
-        }
-
-        if (!str_contains($result['output'] ?? '', 'default')) {
-            return ['status' => 'error', 'message' => 'Default Netzwerk existiert nicht'];
-        }
-
-        // Prüfe ob das Netzwerk aktiv ist
-        if (!str_contains($result['output'] ?? '', 'default active')) {
-            // Aktiviere das Netzwerk
-            $startCommand = ['virsh', '--connect', $this->uri, 'net-start', 'default'];
-            $startResult = $this->executeCommand($startCommand);
-            
-            if ($startResult['status'] === 'error') {
-                return [
-                    'status' => 'error', 
-                    'message' => 'Konnte default Netzwerk nicht starten',
-                    'details' => $startResult['error'] ?? null
-                ];
-            }
-        }
-
-        return ['status' => 'success'];
     }
 }

@@ -11,6 +11,7 @@ use Zerlix\KvmDash\Api\Model\Qemu\QemuRebootModel;
 use Zerlix\KvmDash\Api\Model\Qemu\QemuListDetailsModel;
 use Zerlix\KvmDash\Api\Model\Qemu\QemuCreateVmModel;
 use Zerlix\KvmDash\Api\Model\Qemu\QemuDeleteModel;
+use Zerlix\KvmDash\Api\Model\Qemu\QemuNetworkModel;
 
 class QemuController
 {
@@ -21,6 +22,7 @@ class QemuController
     private QemuListDetailsModel $listDetailModel;
     private QemuCreateVmModel $createVmModel;
     private QemuDeleteModel $deleteModel;
+    private QemuNetworkModel $networkModel;
 
     public function __construct()
     {
@@ -31,6 +33,7 @@ class QemuController
         $this->listDetailModel = new QemuListDetailsModel();
         $this->createVmModel = new QemuCreateVmModel();
         $this->deleteModel = new QemuDeleteModel();
+        $this->networkModel = new QemuNetworkModel();
     }
 
     /**
@@ -84,6 +87,11 @@ class QemuController
         if (strpos($route, 'delete/') === 0 && $method === 'POST') {
             $domain = substr($route, strlen('delete/'));
             return $this->deleteModel->handle($route, $method, $domain);
+        }
+
+        // api/qemu/network/list
+        if ($route === 'network/list' && $method === 'GET') {
+            return $this->networkModel->handle($route, $method);
         }
 
         http_response_code(404);

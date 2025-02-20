@@ -8,50 +8,64 @@ use Exception;
 
 class CommandModel
 {
+    /** @var array<string, string> */
+    private array $commandPaths = [
+        'virsh' => '/usr/bin/virsh',
+        'qemu-img' => '/usr/bin/qemu-img',
+        'virt-install' => '/usr/bin/virt-install',
+        'ip' => '/usr/sbin/ip',
+        'bash' => '/bin/bash'
+    ];
 
     /**
-     * Execute a command and return the output
+     * Execute a command and return the result
      * 
-     * @param array<int, string> $command
-     * @return array<string, string|mixed>
+     * @param array<string> $command
+     * @param array<string, string> $env Optional environment variables
+     * @return array{status: string, output?: string, error?: string}
      */
-    protected function executeCommand(array $command): array
+    protected function executeCommand(array $command, array $env = []): array
     {
-        try {
-            $descriptorspec = [
-                0 => ["pipe", "r"],  // stdin
-                1 => ["pipe", "w"],  // stdout
-                2 => ["pipe", "w"]   // stderr
+        // Replace command with full path
+        if (isset($this->commandPaths[$command[0]])) {
+            $command[0] = $this->commandPaths[$command[0]];
+        }
+
+        error_log("Executing command: " . implode(' ', $command));
+
+        $descriptorspec = [
+            1 => ['pipe', 'w'],
+            2 => ['pipe', 'w']
+        ];
+
+        // Set base environment variables if none provided
+        if (empty($env)) {
+            $env = [
+                'LANG' => 'C',
+                'PATH' => '/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin'
             ];
+        }
 
-            $commandString = implode(' ', $command);
-            $process = proc_open($commandString, $descriptorspec, $pipes);
+        $process = proc_open($command, $descriptorspec, $pipes, null, $env);
 
-            if (!is_resource($process)) {
-                throw new \Exception("Konnte Befehl nicht ausführen: $commandString");
-            }
-
+        if (is_resource($process)) {
             $output = stream_get_contents($pipes[1]);
             $error = stream_get_contents($pipes[2]);
+            fclose($pipes[1]);
+            fclose($pipes[2]);
+            $returnValue = proc_close($process);
 
-            foreach ($pipes as $pipe) {
-                fclose($pipe);
+            if ($returnValue === 0) {
+                return ['status' => 'success', 'output' => $output];
             }
 
-            $exitCode = proc_close($process);
-
-            if ($exitCode !== 0) {
-                return [
-                    'status' => 'error',
-                    'message' => "Command returned non-zero exit code: $exitCode",
-                    'error' => $error,
-                    'command' => $commandString
-                ];
-            }
-
-            return ['status' => 'success', 'output' => $output];
-        } catch (Exception $e) {
-            return ['status' => 'error', 'message' => $e->getMessage()];
+            return [
+                'status' => 'error',
+                'output' => $output,
+                'error' => $error
+            ];
         }
+
+        return ['status' => 'error', 'error' => 'Could not execute command'];
     }
 }

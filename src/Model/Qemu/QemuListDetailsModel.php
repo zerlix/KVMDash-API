@@ -60,19 +60,29 @@ class QemuListDetailsModel extends CommandModel
         ];
 
         // Agent-Details abrufen
-        $commandString = "sh -c " . escapeshellarg("virsh -c qemu:///system qemu-agent-command $domain '{\"execute\":\"guest-network-get-interfaces\"}' | jq .");
-        $agentResponse = $this->executeCommand([$commandString]);
+        $env = ['LANG' => 'C'];
+        $agentCommand = [
+            'virsh',
+            '--connect',
+            $this->uri,
+            'qemu-agent-command',
+            $domain,
+            '{"execute":"guest-network-get-interfaces"}'
+        ];
+        
+        $agentResponse = $this->executeCommand($agentCommand, $env);
+        error_log("Agent response: " . print_r($agentResponse, true));
 
-     
         // Wenn der Befehl erfolgreich war, Output decodieren
         $agentOutput = $agentResponse['output'] ?? '';
         if ($agentResponse['status'] === 'success' && is_string($agentOutput)) {
             $data = json_decode($agentOutput, true);
             if (!is_array($data)) {
+                error_log("Failed to decode agent output: " . $agentOutput);
                 $data = ['return' => []];
             }
         } else {
-            // Fehlerfall: Leeres Netzwerk-Array
+            error_log("Agent command failed: " . ($agentResponse['error'] ?? 'unknown error'));
             $data = ['return' => []];
         }
         

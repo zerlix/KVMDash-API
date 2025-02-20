@@ -7,6 +7,11 @@ use Zerlix\KvmDash\Api\Model\CommandModel;
 
 class HostInfoModel extends CommandModel
 {
+    /** @var array<string, string> */
+    private array $commandPaths = [
+        'hostnamectl' => '/usr/bin/hostnamectl'
+    ];
+
     /**
      * Handle the host information request
      * 
@@ -16,16 +21,28 @@ class HostInfoModel extends CommandModel
      */
     public function handle(string $route, string $method): array
     {
-        /** @var array{status:string, output:string, message?:string} $output */
-        $output = $this->executeCommand(['hostnamectl status --json=pretty']);
-        if ($output['status'] === 'success') {
-            $data = json_decode((string)$output['output'], true);
-            return ['status' => 'success', 'data' => $data];
-        } else {
+        $command = ['hostnamectl', 'status', '--json=pretty'];
+        /** @var array{status:string, output:string, message?:string} */
+        $output = $this->executeCommand($command);
+        
+        if ($output['status'] === 'error') {
             return [
-                'status' => 'error', 
-                'message' => $output['message'] ?? 'Unknown error'
+                'status' => 'error',
+                'message' => $output['message'] ?? 'Konnte Host-Informationen nicht abrufen'
             ];
         }
+
+        $jsonData = json_decode($output['output'], true);
+        if (!is_array($jsonData)) {
+            return [
+                'status' => 'error',
+                'message' => 'Ungültige Ausgabe von hostnamectl'
+            ];
+        }
+
+        return [
+            'status' => 'success',
+            'data' => $jsonData
+        ];
     }
 }
