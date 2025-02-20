@@ -88,33 +88,64 @@ class QemuCreateVmModel extends CommandModel
             return $diskResult;
         }
 
-        // Create VM mit virt-install
+        $networkBridge = $data['network_bridge'];
+
+        // Wähle die richtige Netzwerkkonfiguration
+        if ($networkBridge === 'default') {
+            // Prüfe und aktiviere das default Netzwerk falls nötig
+            $networkStatus = $this->checkAndActivateDefaultNetwork();
+            if ($networkStatus['status'] === 'error') {
+                return $networkStatus;
+            }
+            $networkOption = 'network=default';
+        } else {
+            $networkOption = 'bridge=' . $networkBridge;
+        }
+        
         $virtInstallCommand = [
             'virt-install',
             '--connect',
             $this->uri,
             '--name',
-            (string)$name,          
+            (string)$name,
             '--memory',
-            (string)$memory,        
+            (string)$memory,
             '--vcpus',
-            (string)$vcpus,        
+            (string)$vcpus,
             '--disk',
             "path={$diskPath},format=qcow2",
             '--cdrom',
-            (string)$isoImage,     
+            (string)$isoImage,
             '--network',
-            "bridge={$networkBridge}",
+            $networkOption,
             '--graphics',
             'spice',
             '--noautoconsole',
             '--osinfo',
-            "name={$osVariant}"   
+            "name={$osVariant}"
         ];
-
+        
+        // Debug-Logging
+        error_log('Network configuration: ' . $networkOption);
+        error_log('Complete command: ' . implode(' ', $virtInstallCommand));
+        
         $vmResult = $this->executeCommand($virtInstallCommand);
         if ($vmResult['status'] === 'error') {
-            return $vmResult;
+            // Detailliertes Error-Logging
+            error_log('VM creation failed. Command output: ' . ($vmResult['output'] ?? 'No output'));
+            error_log('VM creation failed. Error message: ' . ($vmResult['error'] ?? 'No error message'));
+            
+            // Lösche die erstellte Disk im Fehlerfall
+            if (file_exists($diskPath)) {
+                unlink($diskPath);
+            }
+            
+            return [
+                'status' => 'error',
+                'message' => 'VM konnte nicht erstellt werden',
+                'details' => $vmResult['output'] ?? 'Keine weiteren Details verfügbar',
+                'error' => $vmResult['error'] ?? null
+            ];
         }
 
         // wait for creat vm command to finish
@@ -167,9 +198,45 @@ class QemuCreateVmModel extends CommandModel
             return 'Network Bridge muss ein String sein';
         }
 
+        // Validate network_bridge value
+        $bridge = $data['network_bridge'];
+        if ($bridge === 'default') {
+            return true; // NAT Netzwerk ist immer erlaubt
+        }
+
+        // Prüfe ob die Bridge existiert
+        $availableBridges = $this->getAvailableBridges();
+        if (!in_array($bridge, $availableBridges, true)) {
+            return "Die Bridge '$bridge' existiert nicht auf dem System";
+        }
+
         return true;
     }
 
+    /**
+     * Get list of available network bridges on the system
+     * 
+     * @return array<string>
+     */
+    private function getAvailableBridges(): array
+    {
+        $command = ['ip', 'link', 'show', 'type', 'bridge'];
+        $result = $this->executeCommand($command);
+
+        if ($result['status'] === 'error') {
+            return [];
+        }
+
+        $bridges = [];
+        $output = $result['output'] ?? '';
+        
+        // Parse bridge interfaces from ip link output
+        if (preg_match_all('/\d+: ([^:@]+)/', $output, $matches)) {
+            $bridges = $matches[1];
+        }
+
+        return array_map('trim', $bridges);
+    }
 
     private function getStoragePoolPath(): string
     {
@@ -197,5 +264,42 @@ class QemuCreateVmModel extends CommandModel
         }
 
         return $path;
+    }
+
+    /**
+     * Prüft und aktiviert das default Netzwerk falls nötig
+     * 
+     * @return array<string, mixed>
+     */
+    private function checkAndActivateDefaultNetwork(): array
+    {
+        // Prüfe ob das Netzwerk existiert
+        $checkCommand = ['virsh', '--connect', $this->uri, 'net-list', '--all'];
+        $result = $this->executeCommand($checkCommand);
+        
+        if ($result['status'] === 'error') {
+            return ['status' => 'error', 'message' => 'Konnte Netzwerkstatus nicht prüfen'];
+        }
+
+        if (!str_contains($result['output'] ?? '', 'default')) {
+            return ['status' => 'error', 'message' => 'Default Netzwerk existiert nicht'];
+        }
+
+        // Prüfe ob das Netzwerk aktiv ist
+        if (!str_contains($result['output'] ?? '', 'default active')) {
+            // Aktiviere das Netzwerk
+            $startCommand = ['virsh', '--connect', $this->uri, 'net-start', 'default'];
+            $startResult = $this->executeCommand($startCommand);
+            
+            if ($startResult['status'] === 'error') {
+                return [
+                    'status' => 'error', 
+                    'message' => 'Konnte default Netzwerk nicht starten',
+                    'details' => $startResult['error'] ?? null
+                ];
+            }
+        }
+
+        return ['status' => 'success'];
     }
 }
