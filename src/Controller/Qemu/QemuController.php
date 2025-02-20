@@ -12,6 +12,7 @@ use Zerlix\KvmDash\Api\Model\Qemu\QemuListDetailsModel;
 use Zerlix\KvmDash\Api\Model\Qemu\QemuCreateVmModel;
 use Zerlix\KvmDash\Api\Model\Qemu\QemuDeleteModel;
 use Zerlix\KvmDash\Api\Model\Qemu\QemuNetworkModel;
+use Zerlix\KvmDash\Api\Model\Qemu\QemuOsInfoModel;
 
 class QemuController
 {
@@ -23,6 +24,7 @@ class QemuController
     private QemuCreateVmModel $createVmModel;
     private QemuDeleteModel $deleteModel;
     private QemuNetworkModel $networkModel;
+    private QemuOsInfoModel $osInfoModel;
 
     public function __construct()
     {
@@ -34,6 +36,7 @@ class QemuController
         $this->createVmModel = new QemuCreateVmModel();
         $this->deleteModel = new QemuDeleteModel();
         $this->networkModel = new QemuNetworkModel();
+        $this->osInfoModel = new QemuOsInfoModel();
     }
 
     /**
@@ -92,6 +95,11 @@ class QemuController
         // api/qemu/network/list
         if ($route === 'network/list' && $method === 'GET') {
             return $this->networkModel->handle($route, $method);
+        }
+
+        // api/qemu/osinfo/list
+        if ($route === 'osinfo/list' && $method === 'GET') {
+            return $this->osInfoModel->handle($route, $method);
         }
 
         http_response_code(404);
