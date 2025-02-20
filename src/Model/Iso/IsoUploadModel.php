@@ -53,55 +53,45 @@ class IsoUploadModel extends CommandModel {
             return ['status' => 'error', 'message' => 'ISO-Datei existiert bereits'];
         }
 
-        // Versuche die Datei herunterzuladen
-        try {
-            $ch = curl_init($url);
-            if ($ch === false) {
-                throw new \Exception('Curl konnte nicht initialisiert werden');
-            }
-
-            $fp = fopen($targetPath, 'w+');
-            if ($fp === false) {
-                throw new \Exception('Zieldatei konnte nicht erstellt werden');
-            }
-
+        // Starte Download im Hintergrund
+        $cmd = sprintf(
+            'nohup php -r \'
+            $ch = curl_init("%s");
+            $fp = fopen("%s", "w+");
             curl_setopt($ch, CURLOPT_FILE, $fp);
             curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
-            curl_setopt($ch, CURLOPT_TIMEOUT, 0); // Kein Timeout
-            
             $success = curl_exec($ch);
-            
-            if ($success === false) {
-                unlink($targetPath); // Lösche unvollständige Datei
-                throw new \Exception('Download fehlgeschlagen: ' . curl_error($ch));
-            }
-
-            $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
-            if ($httpCode !== 200) {
-                unlink($targetPath); // Lösche unvollständige Datei
-                throw new \Exception('HTTP-Fehler: ' . $httpCode);
-            }
-
             curl_close($ch);
             fclose($fp);
+            if ($success) {
+                file_put_contents("%s", json_encode(["status" => "completed"]));
+            } else {
+                file_put_contents("%s", json_encode(["status" => "error", "message" => "Download failed"]));
+            }
+            \' > /dev/null 2>&1 &',
+            escapeshellarg($url),
+            escapeshellarg($targetPath),
+            sys_get_temp_dir() . '/iso_download_status.json',
+            sys_get_temp_dir() . '/iso_download_status.json'
+        );
+        
+        exec($cmd);
 
-            return [
-                'status' => 'success',
-                'message' => 'ISO-Datei erfolgreich heruntergeladen',
-                'data' => [
-                    'filename' => $filename,
-                    'path' => $targetPath
-                ]
-            ];
+        $this->updateDownloadStatus('downloading', 'Download gestartet');
 
-        } catch (\Exception $e) {
-            if (isset($ch)) curl_close($ch);
-            if (isset($fp)) fclose($fp);
-            
-            return [
-                'status' => 'error',
-                'message' => 'Fehler beim Download: ' . $e->getMessage()
-            ];
-        }
+        return [
+            'status' => 'success',
+            'message' => 'Download wurde gestartet'
+        ];
+    }
+
+    private function updateDownloadStatus(string $status, string $message = ''): void {
+        $statusFile = sys_get_temp_dir() . '/iso_download_status.json';
+        $statusData = [
+            'status' => $status,
+            'message' => $message,
+            'timestamp' => time()
+        ];
+        file_put_contents($statusFile, json_encode($statusData));
     }
 }

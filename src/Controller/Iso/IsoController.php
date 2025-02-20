@@ -5,18 +5,21 @@ namespace Zerlix\KvmDash\Api\Controller\Iso;
 use Zerlix\KvmDash\Api\Model\Iso\IsoListModel;
 use Zerlix\KvmDash\Api\Model\Iso\IsoTurnkeyListModel;
 use Zerlix\KvmDash\Api\Model\Iso\IsoUploadModel;
+use Zerlix\KvmDash\Api\Model\Iso\IsoStatusModel;
 
 class IsoController
 {
     private  IsoListModel $listModel;
     private  IsoTurnkeyListModel $turnkeyListModel;
     private  IsoUploadModel $uploadModel;
+    private  IsoStatusModel $statusModel;
 
     public function __construct()
     {
         $this->listModel = new IsoListModel();
         $this->turnkeyListModel = new IsoTurnkeyListModel();
         $this->uploadModel = new IsoUploadModel();
+        $this->statusModel = new IsoStatusModel();
     }
 
     /**
@@ -40,6 +43,11 @@ class IsoController
         if ($route === 'upload' && $method === 'POST') {
             return $this->uploadModel->handle($route, $method);           
         
+        }
+        
+        // api/iso/status
+        if ($route === 'status' && $method === 'GET') {
+            return $this->statusModel->handle($route, $method);
         }
 
         /**
