@@ -4,17 +4,19 @@ namespace Zerlix\KvmDash\Api\Controller\Iso;
 
 use Zerlix\KvmDash\Api\Model\Iso\IsoListModel;
 use Zerlix\KvmDash\Api\Model\Iso\IsoTurnkeyListModel;
-
+use Zerlix\KvmDash\Api\Model\Iso\IsoUploadModel;
 
 class IsoController
 {
     private  IsoListModel $listModel;
     private  IsoTurnkeyListModel $turnkeyListModel;
+    private  IsoUploadModel $uploadModel;
 
     public function __construct()
     {
         $this->listModel = new IsoListModel();
         $this->turnkeyListModel = new IsoTurnkeyListModel();
+        $this->uploadModel = new IsoUploadModel();
     }
 
     /**
@@ -34,12 +36,13 @@ class IsoController
             return $this->listModel->handle($route, $method);
         }
 
-        /** TODO: Implement the following routes
         // api/iso/upload
         if ($route === 'upload' && $method === 'POST') {
-            return ['status' => 'success', 'data' => 'ISO upload'];
+            return $this->uploadModel->handle($route, $method);           
+        
         }
 
+        /**
         // api/iso/delete
         if ($route === 'delete' && $method === 'DELETE') {
             return ['status' => 'success', 'data' => 'ISO delete'];
