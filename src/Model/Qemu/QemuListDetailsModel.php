@@ -74,8 +74,7 @@ class QemuListDetailsModel extends CommandModel
             $vmDetails['stats'] = $this->parseStats($statsResponse['output']);
         }
 
-
-        // Agent-Details abrufen
+        // Versuche zuerst QEMU Guest Agent
         $env = ['LANG' => 'C'];
         $agentCommand = [
             'virsh',
@@ -87,54 +86,17 @@ class QemuListDetailsModel extends CommandModel
         ];
 
         $agentResponse = $this->executeCommand($agentCommand, $env);
-        error_log("Agent response: " . print_r($agentResponse, true));
-
-        // Wenn der Befehl erfolgreich war, Output decodieren
-        $agentOutput = $agentResponse['output'] ?? '';
-        if ($agentResponse['status'] === 'success' && is_string($agentOutput)) {
-            $data = json_decode($agentOutput, true);
-            if (!is_array($data)) {
-                error_log("Failed to decode agent output: " . $agentOutput);
-                $data = ['return' => []];
-            }
+        
+        if ($agentResponse['status'] === 'success' && is_string($agentResponse['output'])) {
+            // Guest Agent verfügbar - nutze dessen Daten
+            $vmDetails['network'] = $this->parseAgentNetworkData($agentResponse['output']);
         } else {
-            error_log("Agent command failed: " . ($agentResponse['error'] ?? 'unknown error'));
-            $data = ['return' => []];
-        }
-
-        // Iteriere über die Rückgabe und füge die Netzwerkschnittstellen (außer Loopback) hinzu
-        if (isset($data['return']) && is_array($data['return'])) {
-            foreach ($data['return'] as $interface) {
-
-                if (!is_array($interface) || !isset($interface['name'])) {
-                    continue;
-                }
-
-                // Loopback (lo) überspringen
-                if ($interface['name'] === 'lo') {
-                    continue;
-                }
-
-                $interfaceData = [
-                    'name'             => $interface['name'],
-                    'hardware_address' => $interface['hardware-address'] ?? 'unknown',
-                    'ip_addresses'     => []
-                ];
-
-                if (isset($interface['ip-addresses']) && is_array($interface['ip-addresses'])) {
-                    foreach ($interface['ip-addresses'] as $ip) {
-                        if (!is_array($ip) || !isset($ip['ip-address'], $ip['ip-address-type'])) {
-                            continue;
-                        }
-
-                        $interfaceData['ip_addresses'][] = [
-                            'type'    => $ip['ip-address-type'],
-                            'address' => $ip['ip-address']
-                        ];
-                    }
-                }
-
-                $vmDetails['network'][] = $interfaceData;
+            // Fallback: Nutze virsh domiflist für basic Netzwerkinformationen
+            $iflistCommand = ['virsh', '-c', $this->uri, 'domiflist', $domain];
+            $iflistResponse = $this->executeCommand($iflistCommand);
+            
+            if ($iflistResponse['status'] === 'success' && is_string($iflistResponse['output'])) {
+                $vmDetails['network'] = $this->parseBasicNetworkData($iflistResponse['output']);
             }
         }
 
@@ -238,5 +200,110 @@ class QemuListDetailsModel extends CommandModel
         }
 
         return $stats;
+    }
+
+    /**
+     * Parst die Netzwerkdaten vom QEMU Guest Agent
+     */
+    private function parseAgentNetworkData(string $output): array
+    {
+        $interfaces = [];
+        $data = json_decode($output, true);
+
+        if (isset($data['return']) && is_array($data['return'])) {
+            foreach ($data['return'] as $interface) {
+                if (!is_array($interface) || !isset($interface['name']) || $interface['name'] === 'lo') {
+                    continue;
+                }
+
+                $interfaces[] = [
+                    'name' => $interface['name'],
+                    'hardware_address' => $interface['hardware-address'] ?? 'unknown',
+                    'ip_addresses' => array_map(
+                        fn($ip) => [
+                            'type' => $ip['ip-address-type'],
+                            'address' => $ip['ip-address']
+                        ],
+                        $interface['ip-addresses'] ?? []
+                    )
+                ];
+            }
+        }
+
+        return $interfaces;
+    }
+
+    /**
+     * Parst basic Netzwerkinformationen aus virsh domiflist
+     */
+    private function parseBasicNetworkData(string $output): array
+    {
+        $interfaces = [];
+        $lines = explode("\n", trim($output));
+        
+        // Erste Zeile überspringen (Header)
+        array_shift($lines);
+        
+        foreach ($lines as $line) {
+            $parts = preg_split('/\s+/', trim($line));
+            if (count($parts) >= 4) {
+                $mac = $parts[4];
+                $interfaces[] = [
+                    'name' => $parts[0],
+                    'hardware_address' => $mac,
+                    'type' => $parts[1],
+                    'source' => $parts[2],
+                    'model' => $parts[3],
+                    'ip_addresses' => $this->findIPsByMAC($mac)
+                ];
+            }
+        }
+
+        return $interfaces;
+    }
+
+    /**
+     * Sucht IP-Adressen für eine gegebene MAC-Adresse
+     */
+    private function findIPsByMAC(string $mac): array
+    {
+        $ips = [];
+        
+        // Versuche IP via 'ip neighbor'
+        $ipNeighborCmd = $this->executeCommand(['ip', 'neighbor']);
+        if ($ipNeighborCmd['status'] === 'success' && is_string($ipNeighborCmd['output'])) {
+            $lines = explode("\n", $ipNeighborCmd['output']);
+            foreach ($lines as $line) {
+                if (stripos($line, strtolower($mac)) !== false) {
+                    if (preg_match('/([0-9a-f:\.]+)\s+dev\s+(\S+)\s+lladdr\s+' . preg_quote($mac, '/') . '/i', $line, $matches)) {
+                        $ip = $matches[1];
+                        $ips[] = [
+                            'type' => filter_var($ip, FILTER_VALIDATE_IP, FILTER_FLAG_IPV6) ? 'ipv6' : 'ipv4',
+                            'address' => $ip
+                        ];
+                    }
+                }
+            }
+        }
+
+        // Alternative: Versuche IP via 'arp -n'
+        if (empty($ips)) {
+            $arpCmd = $this->executeCommand(['arp', '-n']);
+            if ($arpCmd['status'] === 'success' && is_string($arpCmd['output'])) {
+                $lines = explode("\n", $arpCmd['output']);
+                foreach ($lines as $line) {
+                    if (stripos($line, strtolower($mac)) !== false) {
+                        if (preg_match('/([0-9\.]+)\s+/i', $line, $matches)) {
+                            $ips[] = [
+                                'type' => 'ipv4',
+                                'address' => $matches[1]
+                            ];
+                        }
+                    }
+                }
+            }
+        }
+
+        return $ips;
     }
 }
